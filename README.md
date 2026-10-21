@@ -1,63 +1,40 @@
-# Default Project — Game Jam 协作仓库
+﻿# Default Project 鈥?Game Jam 鍗忎綔浠撳簱
 
-Unity **2022.3.62f3c1**（URP 14.0.12）+ 内置 ProjectBase 框架（DOTween、UIManager、EventManager、ObjectPool 等）。
-版本控制使用 **Unity Version Control（UVCS / 原 Plastic SCM）**，已在编辑器内集成。
+Unity **2022.3.62f3c1**锛圲RP 14.0.12锛? 鍐呯疆 ProjectBase 妗嗘灦锛圖OTween銆乁IManager銆丒ventManager銆丱bjectPool 绛夛級銆?鐗堟湰鎺у埗浣跨敤 **Unity Version Control锛圲VCS / 鍘?Plastic SCM锛?*锛屽凡鍦ㄧ紪杈戝櫒鍐呴泦鎴愩€?
+## 1. 棣栨鍑嗗锛堟瘡浜轰竴娆★級
 
-## 1. 首次准备（每人一次）
+1. 瀹夎 **Unity 2022.3.62f3c1**锛堢増鏈繀椤讳竴鑷达紝鐢?Unity Hub 瀹夎锛夈€?2. 鐢?*琚個璇风殑 Unity ID** 鐧诲綍 Unity Hub锛堜笉鏄?GitHub 璐﹀彿锛夈€?3. 缇庢湳/绋嬪簭鎯崇敤鐙珛瀹㈡埛绔椂锛屽彲鍙﹁ **Unity Version Control锛圙luon锛?*锛屼絾缂栬緫鍣ㄥ唴宸插鐢ㄣ€?
+## 2. 鎷夊伐绋?
+1. Unity Hub 鈫?椤圭洰鍒楄〃鍙充笂 `鈰痐 鈫?**Connect to source control**锛堟垨鎵撳紑宸ョ▼鍚?`Window 鈫?Version Control`锛夈€?2. 鐧诲綍 Unity ID 鈫?閫夋嫨鏈槦缁勭粐 鈫?閫夋嫨浠撳簱 鈫?閫夋湰鍦拌矾寰勶紙寤鸿 `E:\UNITY\<椤圭洰鍚?`锛屼笉瑕佹斁 OneDrive锛夈€?3. 绛夊緟涓嬭浇瀹屾垚鍚庯紝Unity Hub `Add project from disk` 閫夎繖涓牴鐩綍鎵撳紑銆?
+> 鎷変笅鏉ョ殑鏄?*椤圭洰鏍圭洰褰?*锛堝拰 `Assets/` 骞崇骇锛夛紝涓嶈鍙彇 `Assets`銆?
+## 3. 姣忓ぉ娴佺▼
 
-1. 安装 **Unity 2022.3.62f3c1**（版本必须一致，用 Unity Hub 安装）。
-2. 用**被邀请的 Unity ID** 登录 Unity Hub（不是 GitHub 账号）。
-3. 美术/程序想用独立客户端时，可另装 **Unity Version Control（Gluon）**，但编辑器内已够用。
+1. `Window 鈫?Version Control` 鐐?**Update**锛堟媺鍙栨渶鏂帮級銆?2. 鏀硅嚜宸辩殑鏂囦欢銆?3. `Pending Changes` 閲屽彧鍕捐嚜宸辨敼鐨勪笢瑗匡紝濉?Changeset 璇存槑锛岀偣 **Check in**銆?4. 鐐?**Push**锛堟垨鎸夎缃嚜鍔ㄦ帹閫侊級銆?
+**璇存槑鍐欐硶寤鸿**锛歚feat: 鐜╁绉诲姩涓庣浉鏈鸿窡闅廯銆乣fix: 璺宠穬绌垮湴`銆乣art: 涓昏璐村浘`銆乣ui: 涓昏彍鍗昤銆?
+**闇€瑕佺嫭鍗犱慨鏀圭殑鏂囦欢**锛堜富鍦烘櫙銆佸叡浜?Prefab銆丳rojectSettings锛夊厛 **Checkout** 鍔犻攣锛屾敼瀹?Check in 鑷姩瑙ｉ攣锛岄伩鍏嶅拰鍒汉鍚屾椂鏀广€?
+## 4. 鐩綍绾﹀畾锛堥伩鍏嶄簰鐩歌鐩栵級
 
-## 2. 拉工程
-
-1. Unity Hub → 项目列表右上 `⋯` → **Connect to source control**（或打开工程后 `Window → Version Control`）。
-2. 登录 Unity ID → 选择本队组织 → 选择仓库 → 选本地路径（建议 `E:\UNITY\<项目名>`，不要放 OneDrive）。
-3. 等待下载完成后，Unity Hub `Add project from disk` 选这个根目录打开。
-
-> 拉下来的是**项目根目录**（和 `Assets/` 平级），不要只取 `Assets`。
-
-## 3. 每天流程
-
-1. `Window → Version Control` 点 **Update**（拉取最新）。
-2. 改自己的文件。
-3. `Pending Changes` 里只勾自己改的东西，填 Changeset 说明，点 **Check in**。
-4. 点 **Push**（或按设置自动推送）。
-
-**说明写法建议**：`feat: 玩家移动与相机跟随`、`fix: 跳跃穿地`、`art: 主角贴图`、`ui: 主菜单`。
-
-**需要独占修改的文件**（主场景、共享 Prefab、ProjectSettings）先 **Checkout** 加锁，改完 Check in 自动解锁，避免和别人同时改。
-
-## 4. 目录约定（避免互相覆盖）
-
-| 目录 | 负责人 | 说明 |
+| 鐩綍 | 璐熻矗浜?| 璇存槑 |
 | --- | --- | --- |
-| `Assets/Scenes/Main.unity` | **仅主程** | 唯一的整合场景，别人不要改 |
-| `Assets/Scripts/` | 程序 | 按模块建子目录，如 `Player/`、`UI/`、`System/` |
-| `Assets/Prefabs/` | 各自 | 做完的 Prefab 放这里，主程负责拖进 Main |
-| `Assets/Art/` | 美术 | 贴图、模型、材质 |
-| `Assets/Audio/` | 美术 / 音效 | BGM、SFX |
-| `Assets/UI/` | UI / 美术 | 界面图、Sprite |
-| `Assets/Text/` | 策划 | 文本表（json/csv/ScriptableObject） |
-| `Assets/AssetsTemplate/` | 框架 | ProjectBase 框架与 DOTween，**不要改** |
+| `Assets/Scenes/Main.unity` | **浠呬富绋?* | 鍞竴鐨勬暣鍚堝満鏅紝鍒汉涓嶈鏀?|
+| `Assets/Scripts/` | 绋嬪簭 | 鎸夋ā鍧楀缓瀛愮洰褰曪紝濡?`Player/`銆乣UI/`銆乣System/` |
+| `Assets/Prefabs/` | 鍚勮嚜 | 鍋氬畬鐨?Prefab 鏀捐繖閲岋紝涓荤▼璐熻矗鎷栬繘 Main |
+| `Assets/Art/` | 缇庢湳 | 璐村浘銆佹ā鍨嬨€佹潗璐?|
+| `Assets/Audio/` | 缇庢湳 / 闊虫晥 | BGM銆丼FX |
+| `Assets/UI/` | UI / 缇庢湳 | 鐣岄潰鍥俱€丼prite |
+| `Assets/Text/` | 绛栧垝 | 鏂囨湰琛紙json/csv/ScriptableObject锛?|
+| `Assets/AssetsTemplate/` | 妗嗘灦 | ProjectBase 妗嗘灦涓?DOTween锛?*涓嶈鏀?* |
 
-**主场景规则**：美术/第二程序只提交 Prefab、脚本、文本表；主程 Update 后自己拖进 `Main.unity` 再 Check in。任何人不要同时编辑主场景。
+**涓诲満鏅鍒?*锛氱編鏈?绗簩绋嬪簭鍙彁浜?Prefab銆佽剼鏈€佹枃鏈〃锛涗富绋?Update 鍚庤嚜宸辨嫋杩?`Main.unity` 鍐?Check in銆備换浣曚汉涓嶈鍚屾椂缂栬緫涓诲満鏅€?
+## 5. 娴嬭瘯鍦烘櫙瑙勮寖锛堥噸瑕侊級
 
-## 5. 冲突处理
+姣忎釜浜哄湪鑷繁鐨勬矙鐩掑満鏅噷骞叉椿锛屾垚鏋滈€氳繃 Prefab 浜や粯锛宍Main.unity` 鍙敱涓荤▼鍚堝苟銆?
+- **缇庢湳**锛氬湪 `Assets/Scenes/Sandbox/` 寤?`Sandbox_Art_鍚嶅瓧`锛岄殢渚胯皟妯″瀷/鏉愯川/鐏厜锛涙弧鎰忓悗鍋氭垚 Prefab 鏀?`Assets/Prefabs/`锛孋heck in銆?- **绋嬪簭**锛氬悓鏍峰缓 `Dev_妯″潡鍚峘锛屽湪閲岄潰璺戦€氶€昏緫锛屼氦浠?Prefab 鎴栫嫭绔嬭剼鏈€?- 闇€瑕佸湪涓诲満鏅幆澧冧笅娴嬭瘯锛氬彸閿?`Main.unity` 鈫?`Open Scene Additive`锛?*涓嶈淇濆瓨瀵?Main 鐨勪慨鏀?*锛堜繚瀛樺墠鍏堢‘璁?Active Scene 涓嶆槸 Main锛夈€?- 鎵€鏈?`Sandbox_*` / `Dev_*` 鍦烘櫙**涓嶈鍔犲叆 Build Settings**锛堝綋鍓嶅彧鏈?`Main.unity` 鍚敤锛涙敞鎰忓埆鎸?"Add Open Scenes"锛屽畠浼氭妸褰撳墠鎵撳紑鐨勬矙鐩掑満鏅姞杩涘幓锛夈€?- 浜や粯 Prefab 鏃惰繛甯︿緷璧栦竴璧风鍏ワ細鍙抽敭 Prefab 鈫?`Select Dependencies`锛岀‘淇濇潗璐?璐村浘/Shader 閮藉湪锛屽惁鍒欓槦鍙嬫媺涓嬫潵鏄矇鑹层€?- 娌欑洅鍦烘櫙鍙互鍏ュ簱锛堥槻鏈湴涓㈠け锛夛紝浣嗗彧鏀硅嚜宸卞悕瀛楃殑閭ｄ釜銆?
+## 6. 鍐茬獊澶勭悊
 
-UVCS 对 Unity YAML 有内置合并，但**同一场景/同一 Prefab 的并发修改仍会产生冲突**。流程：
+UVCS 瀵?Unity YAML 鏈夊唴缃悎骞讹紝浣?*鍚屼竴鍦烘櫙/鍚屼竴 Prefab 鐨勫苟鍙戜慨鏀逛粛浼氫骇鐢熷啿绐?*銆傛祦绋嬶細
 
-1. 冲突时先 **Undo changes** 把自己未提交的改动撤回，别硬合。
-2. 在群里说明改了哪个文件，由该文件当前负责人处理。
-3. 场景/Prefab 冲突无法自动合并时，保留一份原始文件，重做改动。
-
-预防永远比合并便宜：改主场景前先 Checkout；改完立刻 Check in。
-
-## 6. 硬性规则
-
-- **`.meta` 文件必须提交**，Unity 靠它维持引用；不要手动删/改。
-- 不提交 `Library/`、`Temp/`、`Logs/`、`obj/`、`UserSettings/`、`*.csproj`、`*.sln`（已在 `ignore.conf`）。
-- 不要提交 `Build/` 打包产物。
-- 大文件（fbx/png/wav/psd/视频/字体）直接加，UVCS 原生支持，不需要 LFS。
-- 项目设置改了（URP、Input、Tag/Layer、Package）要单独 Check in 并在群里说一声。
-- `.git` / `.gitignore` / `.gitattributes` 保留仅作 GitHub 备份，日常不要再用 Git 提交。
+1. 鍐茬獊鏃跺厛 **Undo changes** 鎶婅嚜宸辨湭鎻愪氦鐨勬敼鍔ㄦ挙鍥烇紝鍒‖鍚堛€?2. 鍦ㄧ兢閲岃鏄庢敼浜嗗摢涓枃浠讹紝鐢辫鏂囦欢褰撳墠璐熻矗浜哄鐞嗐€?3. 鍦烘櫙/Prefab 鍐茬獊鏃犳硶鑷姩鍚堝苟鏃讹紝淇濈暀涓€浠藉師濮嬫枃浠讹紝閲嶅仛鏀瑰姩銆?
+棰勯槻姘歌繙姣斿悎骞朵究瀹滐細鏀逛富鍦烘櫙鍓嶅厛 Checkout锛涙敼瀹岀珛鍒?Check in銆?
+## 6. 纭€ц鍒?
+- **`.meta` 鏂囦欢蹇呴』鎻愪氦**锛孶nity 闈犲畠缁存寔寮曠敤锛涗笉瑕佹墜鍔ㄥ垹/鏀广€?- 涓嶆彁浜?`Library/`銆乣Temp/`銆乣Logs/`銆乣obj/`銆乣UserSettings/`銆乣*.csproj`銆乣*.sln`锛堝凡鍦?`ignore.conf`锛夈€?- 涓嶈鎻愪氦 `Build/` 鎵撳寘浜х墿銆?- 澶ф枃浠讹紙fbx/png/wav/psd/瑙嗛/瀛椾綋锛夌洿鎺ュ姞锛孶VCS 鍘熺敓鏀寔锛屼笉闇€瑕?LFS銆?- 椤圭洰璁剧疆鏀逛簡锛圲RP銆両nput銆乀ag/Layer銆丳ackage锛夎鍗曠嫭 Check in 骞跺湪缇ら噷璇翠竴澹般€?- `.git` / `.gitignore` / `.gitattributes` 淇濈暀浠呬綔 GitHub 澶囦唤锛屾棩甯镐笉瑕佸啀鐢?Git 鎻愪氦銆?
