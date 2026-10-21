@@ -1,4 +1,4 @@
-﻿# Default Project 鈥?Game Jam 鍗忎綔浠撳簱
+# Default Project 鈥?Game Jam 鍗忎綔浠撳簱
 
 Unity **2022.3.62f3c1**锛圲RP 14.0.12锛? 鍐呯疆 ProjectBase 妗嗘灦锛圖OTween銆乁IManager銆丒ventManager銆丱bjectPool 绛夛級銆?鐗堟湰鎺у埗浣跨敤 **Unity Version Control锛圲VCS / 鍘?Plastic SCM锛?*锛屽凡鍦ㄧ紪杈戝櫒鍐呴泦鎴愩€?
 ## 1. 棣栨鍑嗗锛堟瘡浜轰竴娆★級
