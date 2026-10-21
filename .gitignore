@@ -73,3 +73,6 @@ crashlytics-build.properties
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Unity Version Control 工作区元数据
+/.plastic/
