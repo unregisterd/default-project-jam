@@ -1,0 +1,75 @@
+# ---------------------------------------------------------------
+# Unity 官方模板（github/gitignore Unity.gitignore）+ 本项目补充
+# 放在 Unity 项目根目录，与 Assets/ 平级
+# ---------------------------------------------------------------
+
+# Unity 生成目录
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+/[Rr]ecordings/
+
+# Asset meta 只在对应资源被忽略时才忽略（正常必须提交）
+!/[Aa]ssets/**/*.meta
+
+# 想忽略 Asset Store 插件时取消注释
+# /[Aa]ssets/AssetStoreTools*
+
+# JetBrains Rider 自动生成的插件
+/[Aa]ssets/Plugins/Editor/JetBrains*
+
+# 编辑器 / IDE 缓存
+.vs/
+.idea/
+.vscode/
+.gradle/
+.consulo/
+ExportedObj/
+
+# 自动生成的解决方案与工程文件（Unity 会重新生成）
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity 生成的 meta
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+
+# 崩溃报告
+sysinfo.txt
+
+# 打包产物
+*.apk
+*.aab
+*.unitypackage
+*.app
+crashlytics-build.properties
+
+# Addressables 打包产物
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+
+# Android 临时资源
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# 系统垃圾文件
+.DS_Store
+Thumbs.db
+desktop.ini
