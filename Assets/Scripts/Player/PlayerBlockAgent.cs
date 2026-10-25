@@ -146,8 +146,9 @@ public class PlayerBlockAgent : MonoBehaviour
 
     private Block ProbeBlock()
     {
-        Vector3 origin = transform.position + Vector3.up * 0.15f;
-        float distance = groundProbeDistance + 0.15f;
+        float feetY = GetFeetY();
+        Vector3 origin = new Vector3(transform.position.x, feetY + 0.08f, transform.position.z);
+        float distance = 0.08f + groundProbeDistance;
 
         if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, distance, groundMask, QueryTriggerInteraction.Ignore))
         {
@@ -157,11 +158,22 @@ public class PlayerBlockAgent : MonoBehaviour
         return null;
     }
 
+    private float GetFeetY()
+    {
+        if (_controller != null && _controller.height > 0f)
+        {
+            return transform.TransformPoint(_controller.center).y - _controller.height * 0.5f;
+        }
+
+        return transform.position.y;
+    }
+
     private void TeleportOnto(Block block)
     {
         Collider collider = block.GetComponentInChildren<Collider>();
         Vector3 center = collider != null ? collider.bounds.center : block.transform.position;
-        Vector3 target = new Vector3(center.x, block.GetTopHeight() + respawnAboveTop, center.z);
+        float feetOffset = transform.position.y - GetFeetY();
+        Vector3 target = new Vector3(center.x, block.GetTopHeight() + respawnAboveTop + feetOffset, center.z);
         RespawnAt(target);
     }
 
@@ -188,5 +200,28 @@ public class PlayerBlockAgent : MonoBehaviour
         _airborne = false;
         ClearSource();
         _lastGroundedTime = Time.time;
+    }
+
+    private void OnValidate()
+    {
+        CharacterController controller = GetComponent<CharacterController>();
+
+        if (controller == null)
+        {
+            return;
+        }
+
+        float expectedCenterY = controller.height * 0.5f;
+        bool offCenter = Mathf.Abs(controller.center.x) > 0.001f
+                         || Mathf.Abs(controller.center.z) > 0.001f
+                         || Mathf.Abs(controller.center.y - expectedCenterY) > 0.01f;
+
+        if (offCenter)
+        {
+            Debug.LogWarning(
+                $"[PlayerBlockAgent] CharacterController 的 center 应为 (0, {expectedCenterY:0.##}, 0)，当前 {controller.center}。"
+                + " 否则脚底探测会偏，方块不响应。",
+                this);
+        }
     }
 }

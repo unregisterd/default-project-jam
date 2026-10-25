@@ -43,12 +43,12 @@ public class Hud_Whitebox : MonoBehaviour
         GUI.color = previous;
 
         DrawRow(panel.x + 12f, panel.y + 10f, "Selected (jump)", selected);
-        DrawRow(panel.x + 12f, panel.y + 42f, "Standing", standingColor);
+        DrawRow(panel.x + 12f, panel.y + 42f, "Standing", standingColor, standing != null ? standing.name : null);
 
         GUI.Label(new Rect(panel.x + 12f, panel.y + 66f, width - 24f, 20f), "Space jump / F raise / Esc cursor", _labelStyle);
     }
 
-    private void DrawRow(float x, float y, string title, BlockColorDefinition definition)
+    private void DrawRow(float x, float y, string title, BlockColorDefinition definition, string blockName = null)
     {
         GUI.Label(new Rect(x, y, 130f, 20f), title, _labelStyle);
 
@@ -59,6 +59,11 @@ public class Hud_Whitebox : MonoBehaviour
         GUI.color = previous;
 
         string text = definition != null ? definition.displayName : "none";
+
+        if (!string.IsNullOrEmpty(blockName))
+        {
+            text += "  (" + blockName + ")";
+        }
         GUI.Label(new Rect(x + 160f, y, 150f, 20f), text, _labelStyle);
     }
 }

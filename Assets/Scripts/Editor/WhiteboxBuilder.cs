@@ -160,13 +160,13 @@ public static class WhiteboxBuilder
     private static GameObject BuildPlayer(InputActionAsset input, PlayerColorSet colorSet)
     {
         GameObject player = new GameObject("Player");
-        player.transform.position = new Vector3(0f, 0.33f, 0f);
+        player.transform.position = new Vector3(0f, 0.3f, 0f);
         player.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
 
         CharacterController controller = player.AddComponent<CharacterController>();
-        controller.height = 1.8f;
+        controller.height = 1.3f;
         controller.radius = 0.3f;
-        controller.center = new Vector3(0f, 0.9f, 0f);
+        controller.center = new Vector3(0f, 0.65f, 0f);
         controller.slopeLimit = 50f;
         controller.stepOffset = 0.35f;
         controller.skinWidth = 0.02f;
@@ -186,7 +186,7 @@ public static class WhiteboxBuilder
 
         GameObject pivot = new GameObject("CameraPivot");
         pivot.transform.SetParent(player.transform, false);
-        pivot.transform.localPosition = new Vector3(0f, 1.65f, 0f);
+        pivot.transform.localPosition = new Vector3(0f, 1.2f, 0f);
 
         GameObject cameraObject = new GameObject("Main Camera");
         cameraObject.tag = "MainCamera";
