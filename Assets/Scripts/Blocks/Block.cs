@@ -121,6 +121,12 @@ public class Block : MonoBehaviour
         return collider != null ? collider.bounds.max.y : transform.position.y;
     }
 
+    public float GetBottomHeight()
+    {
+        Collider collider = GetComponentInChildren<Collider>();
+        return collider != null ? collider.bounds.min.y : transform.position.y;
+    }
+
     public void ApplyColor(bool instant)
     {
         if (view == null)
