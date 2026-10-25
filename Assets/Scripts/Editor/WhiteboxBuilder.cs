@@ -382,6 +382,13 @@ public static class WhiteboxBuilder
 
     private static void Cleanup()
     {
+        GameObject demo = GameObject.Find("Demo_GoldBlock");
+
+        if (demo != null && demo.transform.parent != null)
+        {
+            demo.transform.SetParent(null, true);
+        }
+
         DestroyIfExists("WhiteboxRoot");
     }
 
