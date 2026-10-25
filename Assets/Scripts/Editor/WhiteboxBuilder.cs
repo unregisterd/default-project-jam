@@ -77,12 +77,27 @@ public static class WhiteboxBuilder
         Transform level = new GameObject("Level_01").transform;
         level.SetParent(root, false);
 
+        List<Block> blocks = new List<Block>();
+
         foreach (BlockSpec spec in GetSpecs())
         {
-            SpawnBlock(level, prefab, spec, types, palette);
+            Block block = SpawnBlock(level, prefab, spec, types, palette);
+
+            if (block != null)
+            {
+                blocks.Add(block);
+            }
         }
 
-        GameObject player = BuildPlayer(input, colorSet);
+        GameObject player = GameObject.Find("Player");
+
+        if (player == null)
+        {
+            player = BuildPlayer(input, colorSet);
+        }
+
+        BuildRevealLogic(root, blocks, player);
+        BuildDemoBlock(root);
         EnsureLight();
 
         EditorSceneManager.MarkSceneDirty(scene);
@@ -90,24 +105,21 @@ public static class WhiteboxBuilder
         AssetDatabase.SaveAssets();
         Selection.activeGameObject = player;
 
-        Debug.Log("[Whitebox] 生成完成。路线：S→A→B→C→D（错色回溯点 D→Fail_Red）→X→R1（按 F 升高）→R3→Goal。");
+        Debug.Log("[Whitebox] 第一关生成完成：灰白世界 → 第一次跳跃红色显现 → 同色连跳 → 落点翻蓝 → 锁死块 → 终点。");
     }
 
     private static BlockSpec[] GetSpecs()
     {
         return new[]
         {
-            Spec("S_Start", 0f, 0f, 0.25f, "Fixed_Red", false),
-            Spec("A_Loop", 3f, 0f, 0.25f, "Loop_RedBlue", true),
-            Spec("B_Lock", 6f, 0f, 0.25f, "Lock_BlueRed", true),
-            Spec("C_Loop", 9f, 0f, 0.25f, "Loop_RedBlue", true),
-            Spec("D_FixedBlue", 12f, 0f, 0.25f, "Fixed_Blue", true),
-            Spec("Fail_Red", 15f, 0f, 0.25f, "Fixed_Red", true),
-            Spec("X_FixedBlue", 12f, 3f, 0.25f, "Fixed_Blue", true),
-            Spec("R1_Raise", 12f, 6f, 0.25f, "Fixed_Blue", true),
-            Spec("R2_HeightRef", 15f, 6f, 2.25f, "Fixed_Red", false),
-            Spec("R3_Path", 12f, 9f, 2.25f, "Fixed_Blue", false),
-            Spec("Goal", 12f, 12f, 2.25f, "Fixed_Blue", false),
+            Spec("G0_Spawn", 0f, 0f, 0.25f, "Fixed_Red", false),
+            Spec("G1", 3f, 0f, 0.25f, "Fixed_Red", false),
+            Spec("G2", 6f, 0f, 0.25f, "Fixed_Red", false),
+            Spec("P1_Reveal", 9f, 0f, 0.25f, "Fixed_Red", true),
+            Spec("P2_Loop", 12f, 0f, 0.25f, "Loop_RedBlue", true),
+            Spec("P3_Blue", 15f, 0f, 0.25f, "Fixed_Blue", true),
+            Spec("P4_Lock", 18f, 0f, 0.25f, "Lock_BlueRed", true),
+            Spec("Goal", 21f, 0f, 0.25f, "Fixed_Red", false),
         };
     }
 
@@ -124,7 +136,7 @@ public static class WhiteboxBuilder
         };
     }
 
-    private static void SpawnBlock(Transform parent, GameObject prefab, BlockSpec spec, Dictionary<string, BlockType> types, BlockPalette palette)
+    private static Block SpawnBlock(Transform parent, GameObject prefab, BlockSpec spec, Dictionary<string, BlockType> types, BlockPalette palette)
     {
         GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab, parent);
         instance.name = spec.Name;
@@ -139,22 +151,65 @@ public static class WhiteboxBuilder
         if (block == null)
         {
             Debug.LogError($"[Whitebox] 预制体 {PrefabPath} 上没有 Block 组件。");
-            return;
+            return null;
         }
 
         SerializedObject serializedObject = new SerializedObject(block);
         SetObject(serializedObject, "type", type);
         SetObject(serializedObject, "palette", palette);
         SetBool(serializedObject, "canRaise", spec.CanRaise);
+        SetBool(serializedObject, "startGray", true);
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
 
-        BlockColorDefinition definition = palette.GetOrDefault(type.Colors[0]);
+        BlockColorDefinition definition = palette.GetOrDefault("Gray");
         Renderer targetRenderer = instance.GetComponentInChildren<Renderer>();
 
         if (definition != null && definition.material != null && targetRenderer != null)
         {
             targetRenderer.sharedMaterial = definition.material;
         }
+
+        return block;
+    }
+
+    private static void BuildRevealLogic(Transform root, List<Block> blocks, GameObject player)
+    {
+        GameObject logic = new GameObject("LevelLogic");
+        logic.transform.SetParent(root, false);
+
+        BlockRevealOnFirstJump reveal = logic.AddComponent<BlockRevealOnFirstJump>();
+        reveal.SetTargets(blocks.ToArray());
+
+        PlayerInputReader input = player != null ? player.GetComponent<PlayerInputReader>() : null;
+
+        if (input != null)
+        {
+            SerializedObject serializedObject = new SerializedObject(reveal);
+            SetObject(serializedObject, "input", input);
+            serializedObject.ApplyModifiedPropertiesWithoutUndo();
+        }
+    }
+
+    private static void BuildDemoBlock(Transform root)
+    {
+        Material gold = GetOrCreateTransparentMaterial("M_Demo_Gold", new Color(1f, 0.82f, 0.35f, 0.35f));
+
+        GameObject demo = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        demo.name = "Demo_GoldBlock";
+        demo.transform.SetParent(root, false);
+        demo.transform.position = new Vector3(4.5f, 1.6f, -4f);
+        demo.transform.localScale = new Vector3(1f, 1f, 1f);
+
+        Object.DestroyImmediate(demo.GetComponent<Collider>());
+
+        Renderer renderer = demo.GetComponent<Renderer>();
+
+        if (renderer != null && gold != null)
+        {
+            renderer.sharedMaterial = gold;
+        }
+
+        demo.AddComponent<DemoBlockBob>();
     }
 
     private static GameObject BuildPlayer(InputActionAsset input, PlayerColorSet colorSet)
@@ -321,8 +376,6 @@ public static class WhiteboxBuilder
     private static void Cleanup()
     {
         DestroyIfExists("WhiteboxRoot");
-        DestroyIfExists("Player");
-        DestroyIfExists("Main Camera");
     }
 
     private static void DestroyIfExists(string objectName)
@@ -377,6 +430,42 @@ public static class WhiteboxBuilder
         material.SetFloat("_Smoothness", 0.2f);
         material.SetFloat("_Metallic", 0f);
         material.enableInstancing = true;
+        EditorUtility.SetDirty(material);
+        return material;
+    }
+
+    private static Material GetOrCreateTransparentMaterial(string materialName, Color color)
+    {
+        Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+
+        if (shader == null)
+        {
+            Debug.LogError("[Whitebox] 找不到 URP Lit shader。");
+            return null;
+        }
+
+        string path = $"{MaterialFolder}/{materialName}.mat";
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+
+        if (material == null)
+        {
+            material = new Material(shader);
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        material.SetFloat("_Surface", 1f);
+        material.SetFloat("_Blend", 0f);
+        material.SetFloat("_AlphaClip", 0f);
+        material.SetOverrideTag("RenderType", "Transparent");
+        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        material.SetInt("_ZWrite", 0);
+        material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        material.DisableKeyword("_ALPHATEST_ON");
+        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+        material.SetColor("_BaseColor", color);
+        material.SetFloat("_Smoothness", 0.5f);
+        material.SetFloat("_Metallic", 0f);
         EditorUtility.SetDirty(material);
         return material;
     }

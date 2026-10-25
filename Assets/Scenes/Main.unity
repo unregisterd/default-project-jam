@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 2100000, guid: f2b5f3f20933f434e850db1b710542fd, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -192,6 +192,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73c38c783c0634f4da89802369cdce7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  input: {fileID: 0}
   motor: {fileID: 0}
   colorSelector: {fileID: 0}
   groundMask:
@@ -201,6 +202,7 @@ MonoBehaviour:
   airborneGrace: 0.1
   fallRespawnY: -12
   respawnAboveTop: 0.08
+  flipOnInPlaceJump: 1
 --- !u!114 &238314286
 MonoBehaviour:
   m_ObjectHideFlags: 0
