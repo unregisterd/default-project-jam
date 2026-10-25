@@ -1,11 +1,13 @@
 using UnityEngine;
 
-public class BlockRevealOnFirstJump : MonoBehaviour
+public class FirstJumpReveal : MonoBehaviour
 {
     [Tooltip("留空则自动找场景里的 PlayerInputReader")]
     [SerializeField] private PlayerInputReader input;
-    [Tooltip("第一次跳跃时一起显现颜色的方块")]
-    [SerializeField] private Block[] targets = new Block[0];
+    [Tooltip("第一次跳跃时换色的方块（出生大方块）")]
+    [SerializeField] private Block target;
+    [Tooltip("换成的类型，例如 T_Fixed_Red")]
+    [SerializeField] private BlockType revealedType;
 
     private bool _revealed;
 
@@ -38,17 +40,18 @@ public class BlockRevealOnFirstJump : MonoBehaviour
 
         _revealed = true;
 
-        for (int i = 0; i < targets.Length; i++)
+        if (target == null || revealedType == null)
         {
-            if (targets[i] != null)
-            {
-                targets[i].Reveal();
-            }
+            return;
         }
+
+        target.SetType(revealedType);
+        target.ResetState();
     }
 
-    public void SetTargets(Block[] blocks)
+    public void SetTarget(Block block, BlockType type)
     {
-        targets = blocks ?? new Block[0];
+        target = block;
+        revealedType = type;
     }
 }

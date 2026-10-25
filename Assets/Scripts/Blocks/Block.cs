@@ -18,15 +18,9 @@ public class Block : MonoBehaviour
     [SerializeField] private bool canRaise = true;
     [Tooltip("初始在序列里的位置，一般填 0")]
     [SerializeField] private int startColorIndex;
-    [Tooltip("勾选后开局显示为灰色，等 Reveal() 才显示真实颜色（灰白世界 → 颜色显现）")]
-    [SerializeField] private bool startGray;
-    [Tooltip("灰色预览使用的颜色 ID")]
-    [SerializeField] private string grayColorId = "Gray";
-
     private int _colorIndex;
     private bool _raised;
     private bool _warned;
-    private bool _grayed;
 
     public event Action<Block> ColorChanged;
 
@@ -51,16 +45,6 @@ public class Block : MonoBehaviour
             if (palette == null)
             {
                 return null;
-            }
-
-            if (_grayed || (!Application.isPlaying && startGray))
-            {
-                BlockColorDefinition gray = palette.GetOrDefault(grayColorId);
-
-                if (gray != null)
-                {
-                    return gray;
-                }
             }
 
             if (type == null || !type.IsValid)
@@ -100,13 +84,12 @@ public class Block : MonoBehaviour
             palette = type.Palette;
         }
 
-        _grayed = startGray;
         ResetState();
     }
 
     public bool TryAdvance()
     {
-        if (_grayed || !CanAdvance)
+        if (!CanAdvance)
         {
             return false;
         }
@@ -125,23 +108,6 @@ public class Block : MonoBehaviour
         _colorIndex = Mathf.Clamp(startColorIndex, 0, count - 1);
         _raised = false;
         ApplyColor(true);
-    }
-
-    public void Reveal()
-    {
-        if (!_grayed)
-        {
-            return;
-        }
-
-        _grayed = false;
-        ApplyColor(true);
-    }
-
-    public void SetStartGray(bool value)
-    {
-        startGray = value;
-        _grayed = value;
     }
 
     public void MarkRaised()

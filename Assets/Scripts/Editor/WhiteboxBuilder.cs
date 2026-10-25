@@ -28,6 +28,7 @@ public static class WhiteboxBuilder
         public float TopY;
         public string Type;
         public bool CanRaise;
+        public float Size;
     }
 
     [MenuItem("Tools/Whitebox/Build Playable Whitebox")]
@@ -96,8 +97,9 @@ public static class WhiteboxBuilder
             player = BuildPlayer(input, colorSet);
         }
 
-        BuildRevealLogic(root, blocks, player);
-        BuildDemoBlock(root);
+        Block spawnBlock = blocks.Count > 0 ? blocks[0] : null;
+        BuildRevealLogic(root, spawnBlock, types["Fixed_Red"], player);
+        BuildDemoBlock();
         EnsureLight();
 
         EditorSceneManager.MarkSceneDirty(scene);
@@ -112,18 +114,18 @@ public static class WhiteboxBuilder
     {
         return new[]
         {
-            Spec("G0_Spawn", 0f, 0f, 0.25f, "Fixed_Red", false),
-            Spec("G1", 3f, 0f, 0.25f, "Fixed_Red", false),
-            Spec("G2", 6f, 0f, 0.25f, "Fixed_Red", false),
-            Spec("P1_Reveal", 9f, 0f, 0.25f, "Fixed_Red", true),
-            Spec("P2_Loop", 12f, 0f, 0.25f, "Loop_RedBlue", true),
-            Spec("P3_Blue", 15f, 0f, 0.25f, "Fixed_Blue", true),
-            Spec("P4_Lock", 18f, 0f, 0.25f, "Lock_BlueRed", true),
-            Spec("Goal", 21f, 0f, 0.25f, "Fixed_Red", false),
+            Spec("G0_Spawn", 0f, 0f, 0.25f, "Fixed_Gray", false, 4f),
+            Spec("G1", 4f, 0f, 0.25f, "Fixed_Red", false),
+            Spec("G2", 7f, 0f, 0.25f, "Fixed_Red", false),
+            Spec("P1_Reveal", 10f, 0f, 0.25f, "Fixed_Red", true),
+            Spec("P2_Loop", 13f, 0f, 0.25f, "Loop_RedBlue", true),
+            Spec("P3_Blue", 16f, 0f, 0.25f, "Fixed_Blue", true),
+            Spec("P4_Lock", 19f, 0f, 0.25f, "Lock_BlueRed", true),
+            Spec("Goal", 22f, 0f, 0.25f, "Fixed_Red", false),
         };
     }
 
-    private static BlockSpec Spec(string name, float x, float z, float topY, string type, bool canRaise)
+    private static BlockSpec Spec(string name, float x, float z, float topY, string type, bool canRaise, float size = 2f)
     {
         return new BlockSpec
         {
@@ -133,6 +135,7 @@ public static class WhiteboxBuilder
             TopY = topY,
             Type = type,
             CanRaise = canRaise,
+            Size = size,
         };
     }
 
@@ -143,7 +146,7 @@ public static class WhiteboxBuilder
 
         float thickness = Mathf.Max(BaseThickness, spec.TopY);
         instance.transform.position = new Vector3(spec.X, spec.TopY - thickness * 0.5f, spec.Z);
-        instance.transform.localScale = new Vector3(BlockSize, thickness, BlockSize);
+        instance.transform.localScale = new Vector3(spec.Size, thickness, spec.Size);
 
         BlockType type = types[spec.Type];
         Block block = instance.GetComponent<Block>();
@@ -158,10 +161,9 @@ public static class WhiteboxBuilder
         SetObject(serializedObject, "type", type);
         SetObject(serializedObject, "palette", palette);
         SetBool(serializedObject, "canRaise", spec.CanRaise);
-        SetBool(serializedObject, "startGray", true);
         serializedObject.ApplyModifiedPropertiesWithoutUndo();
 
-        BlockColorDefinition definition = palette.GetOrDefault("Gray");
+        BlockColorDefinition definition = palette.GetOrDefault(type.Colors[0]);
         Renderer targetRenderer = instance.GetComponentInChildren<Renderer>();
 
         if (definition != null && definition.material != null && targetRenderer != null)
@@ -172,13 +174,13 @@ public static class WhiteboxBuilder
         return block;
     }
 
-    private static void BuildRevealLogic(Transform root, List<Block> blocks, GameObject player)
+    private static void BuildRevealLogic(Transform root, Block spawnBlock, BlockType revealedType, GameObject player)
     {
         GameObject logic = new GameObject("LevelLogic");
         logic.transform.SetParent(root, false);
 
-        BlockRevealOnFirstJump reveal = logic.AddComponent<BlockRevealOnFirstJump>();
-        reveal.SetTargets(blocks.ToArray());
+        FirstJumpReveal reveal = logic.AddComponent<FirstJumpReveal>();
+        reveal.SetTarget(spawnBlock, revealedType);
 
         PlayerInputReader input = player != null ? player.GetComponent<PlayerInputReader>() : null;
 
@@ -190,13 +192,17 @@ public static class WhiteboxBuilder
         }
     }
 
-    private static void BuildDemoBlock(Transform root)
+    private static void BuildDemoBlock()
     {
+        if (GameObject.Find("Demo_GoldBlock") != null)
+        {
+            return;
+        }
+
         Material gold = GetOrCreateTransparentMaterial("M_Demo_Gold", new Color(1f, 0.82f, 0.35f, 0.35f));
 
         GameObject demo = GameObject.CreatePrimitive(PrimitiveType.Cube);
         demo.name = "Demo_GoldBlock";
-        demo.transform.SetParent(root, false);
         demo.transform.position = new Vector3(4.5f, 1.6f, -4f);
         demo.transform.localScale = new Vector3(1f, 1f, 1f);
 
@@ -309,6 +315,7 @@ public static class WhiteboxBuilder
     {
         Dictionary<string, BlockType> types = new Dictionary<string, BlockType>
         {
+            ["Fixed_Gray"] = GetOrCreateType("T_Fixed_Gray", palette, new[] { "Gray" }, false, "固定灰，灰白世界"),
             ["Fixed_Red"] = GetOrCreateType("T_Fixed_Red", palette, new[] { "Red" }, false, "固定红，被踩不翻色"),
             ["Fixed_Blue"] = GetOrCreateType("T_Fixed_Blue", palette, new[] { "Blue" }, false, "固定蓝，被踩不翻色"),
             ["Loop_RedBlue"] = GetOrCreateType("T_Loop_RedBlue", palette, new[] { "Red", "Blue" }, true, "红蓝循环，可无限翻"),
@@ -447,12 +454,13 @@ public static class WhiteboxBuilder
         string path = $"{MaterialFolder}/{materialName}.mat";
         Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
 
-        if (material == null)
+        if (material != null)
         {
-            material = new Material(shader);
-            AssetDatabase.CreateAsset(material, path);
+            return material;
         }
 
+        material = new Material(shader);
+        AssetDatabase.CreateAsset(material, path);
         material.SetFloat("_Surface", 1f);
         material.SetFloat("_Blend", 0f);
         material.SetFloat("_AlphaClip", 0f);
