@@ -12,6 +12,12 @@ public class PlayerColorSet : ScriptableObject
     public BlockPalette Palette => palette;
     public int Count => colorIds != null ? colorIds.Length : 0;
 
+    public void Configure(BlockPalette paletteAsset, string[] ids)
+    {
+        palette = paletteAsset;
+        colorIds = ids ?? new string[0];
+    }
+
     public BlockColorDefinition Get(int index)
     {
         if (palette == null || Count == 0)

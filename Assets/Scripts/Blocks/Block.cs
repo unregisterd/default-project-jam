@@ -159,4 +159,27 @@ public class Block : MonoBehaviour
     {
         canRaise = value;
     }
+
+    private void OnValidate()
+    {
+        if (Application.isPlaying)
+        {
+            return;
+        }
+
+        if (view == null)
+        {
+            view = GetComponentInChildren<BlockView>(true);
+        }
+
+        if (palette == null && type != null)
+        {
+            palette = type.Palette;
+        }
+
+        if (type != null)
+        {
+            ApplyColor(true);
+        }
+    }
 }

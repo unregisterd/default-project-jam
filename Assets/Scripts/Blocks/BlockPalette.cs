@@ -30,6 +30,11 @@ public class BlockPalette : ScriptableObject
         return false;
     }
 
+    public void SetColors(BlockColorDefinition[] newColors)
+    {
+        colors = newColors ?? Array.Empty<BlockColorDefinition>();
+    }
+
     public BlockColorDefinition GetOrDefault(string id)
     {
         return TryGet(id, out BlockColorDefinition definition) ? definition : null;

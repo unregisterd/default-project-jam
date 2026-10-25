@@ -21,4 +21,16 @@ public class BlockType : ScriptableObject
     public string Note => note;
 
     public bool IsValid => colors != null && colors.Length > 0;
+
+    public void Configure(BlockPalette paletteAsset, string[] colorIds, bool loopColors, string noteText = null)
+    {
+        palette = paletteAsset;
+        colors = colorIds ?? new string[0];
+        loop = loopColors;
+
+        if (!string.IsNullOrEmpty(noteText))
+        {
+            note = noteText;
+        }
+    }
 }
