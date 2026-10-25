@@ -18,13 +18,15 @@ public class PlayerBlockAgent : MonoBehaviour
     [SerializeField] private float respawnAboveTop = 0.08f;
     [Tooltip("原地跳（按空格起跳并落回同一块）时是否翻开脚下方块")]
     [SerializeField] private bool flipOnInPlaceJump = true;
+    [Tooltip("按下跳跃后多久内离地，仍算作一次跳跃（秒）")]
+    [SerializeField] private float jumpIntentWindow = 0.2f;
 
     private CharacterController _controller;
     private Block _standingBlock;
     private Block _sourceBlock;
     private string _sourceColorId;
     private bool _airborne;
-    private bool _jumpInitiated;
+    private float _lastJumpPressedAt = -999f;
     private bool _leftGroundByJump;
     private float _lastGroundedTime;
     private Vector3 _lastSafePosition;
@@ -66,6 +68,11 @@ public class PlayerBlockAgent : MonoBehaviour
             return;
         }
 
+        if (input != null && input.JumpPressed)
+        {
+            _lastJumpPressedAt = Time.time;
+        }
+
         if (_controller.isGrounded)
         {
             _lastGroundedTime = Time.time;
@@ -75,11 +82,6 @@ public class PlayerBlockAgent : MonoBehaviour
                 _airborne = false;
                 ResolveLanding();
                 return;
-            }
-
-            if (input != null && input.JumpPressed)
-            {
-                _jumpInitiated = true;
             }
 
             Block under = ProbeBlock();
@@ -104,8 +106,7 @@ public class PlayerBlockAgent : MonoBehaviour
         _airborne = true;
         _sourceBlock = _standingBlock;
         _sourceColorId = _sourceBlock != null ? _sourceBlock.CurrentColorId : null;
-        _leftGroundByJump = _jumpInitiated;
-        _jumpInitiated = false;
+        _leftGroundByJump = Time.time - _lastJumpPressedAt <= jumpIntentWindow;
     }
 
     private void ResolveLanding()
@@ -215,7 +216,6 @@ public class PlayerBlockAgent : MonoBehaviour
         _standingBlock = null;
         ClearSource();
         _airborne = false;
-        _jumpInitiated = false;
         _lastGroundedTime = Time.time;
         _lastSafePosition = position;
     }
