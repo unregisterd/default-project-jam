@@ -20,6 +20,8 @@ public class PlayerBlockAgent : MonoBehaviour
     [SerializeField] private bool flipOnInPlaceJump = true;
     [Tooltip("按下跳跃后多久内离地，仍算作一次跳跃（秒）")]
     [SerializeField] private float jumpIntentWindow = 0.2f;
+    [Tooltip("打印落地判定细节，排查用")]
+    [SerializeField] private bool debugLanding = true;
 
     private CharacterController _controller;
     private Block _standingBlock;
@@ -107,11 +109,21 @@ public class PlayerBlockAgent : MonoBehaviour
         _sourceBlock = _standingBlock;
         _sourceColorId = _sourceBlock != null ? _sourceBlock.CurrentColorId : null;
         _leftGroundByJump = Time.time - _lastJumpPressedAt <= jumpIntentWindow;
+
+        if (debugLanding)
+        {
+            Debug.Log($"[Landing] lift source={(_sourceBlock != null ? _sourceBlock.name : "null")} color={_sourceColorId} byJump={_leftGroundByJump} dt={Time.time - _lastJumpPressedAt:0.00}");
+        }
     }
 
     private void ResolveLanding()
     {
         Block landed = ProbeBlock();
+
+        if (debugLanding)
+        {
+            Debug.Log($"[Landing] landed={(landed != null ? landed.name : "null")} color={(landed != null ? landed.CurrentColorId : "-")} source={(_sourceBlock != null ? _sourceBlock.name : "null")} same={landed == _sourceBlock} byJump={_leftGroundByJump}");
+        }
 
         if (_sourceBlock == null)
         {
