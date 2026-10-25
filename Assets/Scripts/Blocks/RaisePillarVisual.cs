@@ -5,7 +5,7 @@ using UnityEngine.Rendering;
 public class RaisePillarVisual : MonoBehaviour
 {
     [Tooltip("柱段高度，与关卡高度单位一致")]
-    [SerializeField] private float segmentHeight = 0.5f;
+    [SerializeField] private float segmentHeight = 2f;
     [Tooltip("柱段预制体（美术版，无碰撞、轴心居中）；留空则用方块的占地自动生成方块段")]
     [SerializeField] private GameObject segmentPrefab;
     [Tooltip("每段之间弹出的错峰时间")]
@@ -52,19 +52,25 @@ public class RaisePillarVisual : MonoBehaviour
             }
 
             segment.transform.SetParent(_container, false);
-            segment.transform.position = new Vector3(center.x, bottom + segmentHeight * (i + 0.5f), center.z);
+            
+            // 1. 计算这一截柱子的最终中心位置
+            Vector3 finalPosition = new Vector3(center.x, bottom + segmentHeight * (i + 0.5f), center.z);
+            
+            // 2. 设置正确的尺寸（不再通过 Scale 动画变大）
+            segment.transform.localScale = new Vector3(footprint.x, segmentHeight, footprint.z);
             segment.transform.rotation = Quaternion.identity;
 
-            Vector3 baseScale = segment.transform.localScale;
-            segment.transform.localScale = new Vector3(baseScale.x, baseScale.y * 0.01f, baseScale.z);
+            // 3. 初始位置：将它藏在下方一个身位的地方
+            segment.transform.position = finalPosition - Vector3.up * segmentHeight;
 
+            // 4. 使用 DOMoveY 让它从下方“顶”出来
+            // Ease.OutBack 会带一点机械弹性的停顿感，非常像活塞
             Tween pop = segment.transform
-                .DOScaleY(baseScale.y, popDuration)
+                .DOMoveY(finalPosition.y, popDuration)
                 .SetEase(Ease.OutBack);
 
             sequence.Insert(i * stagger, pop);
         }
-
         sequence.SetLink(gameObject);
     }
 

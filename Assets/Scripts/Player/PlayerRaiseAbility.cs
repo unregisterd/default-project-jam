@@ -14,7 +14,7 @@ public class PlayerRaiseAbility : MonoBehaviour
     [Tooltip("升高动画时长（秒）")]
     [SerializeField] private float raiseDuration = 0.45f;
     [Tooltip("柱段高度，也是升高的最小单位；delta 会吸附到它的整数倍")]
-    [SerializeField] private float raiseStep = 0.5f;
+    [SerializeField] private float raiseStep = 2f;
     [Tooltip("目标高度差小于该值时视为无需升高")]
     [SerializeField] private float minHeightDelta = 0.5f;
     [Tooltip("目标高度差大于该值时视为太远，防止瞬间飞天")]
