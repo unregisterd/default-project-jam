@@ -12,7 +12,7 @@ public class PlayerInputReader : MonoBehaviour
     public Vector2 Look { get; private set; }
     public bool JumpPressed { get; private set; }
     public bool SprintHeld { get; private set; }
-    public bool FlipPressed { get; private set; }
+    public bool RaisePressed { get; private set; }
     public bool IsReady => _ready;
 
     private InputActionMap _map;
@@ -20,7 +20,7 @@ public class PlayerInputReader : MonoBehaviour
     private InputAction _lookAction;
     private InputAction _jumpAction;
     private InputAction _sprintAction;
-    private InputAction _flipAction;
+    private InputAction _raiseAction;
     private bool _ready;
 
     private void Awake()
@@ -42,7 +42,7 @@ public class PlayerInputReader : MonoBehaviour
         _lookAction = _map.FindAction("Look", false);
         _jumpAction = _map.FindAction("Jump", false);
         _sprintAction = _map.FindAction("Sprint", false);
-        _flipAction = _map.FindAction("Flip", false);
+        _raiseAction = _map.FindAction("Raise", false);
 
         if (_moveAction == null || _lookAction == null)
         {
@@ -80,7 +80,7 @@ public class PlayerInputReader : MonoBehaviour
         Look = _lookAction.ReadValue<Vector2>();
         JumpPressed = _jumpAction != null && _jumpAction.WasPressedThisFrame();
         SprintHeld = _sprintAction != null && _sprintAction.IsPressed();
-        FlipPressed = _flipAction != null && _flipAction.WasPressedThisFrame();
+        RaisePressed = _raiseAction != null && _raiseAction.WasPressedThisFrame();
     }
 
     public void SetActions(InputActionAsset asset)
