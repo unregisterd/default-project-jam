@@ -46,9 +46,34 @@ public class BlockLabel : MonoBehaviour
             return;
         }
 
-        float distance = Vector3.Distance(camera.transform.position, _text.transform.position);
-        _text.enabled = distance <= maxVisibleDistance;
+        if (maxVisibleDistance > 0f)
+        {
+            float distance = Vector3.Distance(camera.transform.position, _text.transform.position);
+            _text.enabled = distance <= maxVisibleDistance;
+        }
+        else
+        {
+            _text.enabled = true;
+        }
+
         _text.transform.rotation = camera.transform.rotation;
+    }
+
+    public void Configure(float height, float size, float visibleDistance, bool tint)
+    {
+        heightAboveTop = height;
+        fontSize = size;
+        maxVisibleDistance = visibleDistance;
+        tintByCurrentColor = tint;
+
+        if (_text == null)
+        {
+            BuildText();
+        }
+
+        _text.fontSize = fontSize;
+        UpdatePosition();
+        RefreshLabel();
     }
 
     public void RefreshLabel()
@@ -103,6 +128,16 @@ public class BlockLabel : MonoBehaviour
         _text.outlineWidth = 0.18f;
         _text.outlineColor = Color.black;
 
+        UpdatePosition();
+    }
+
+    private void UpdatePosition()
+    {
+        if (_text == null)
+        {
+            return;
+        }
+
         float halfHeight = 1f;
         Collider collider = GetComponentInChildren<Collider>();
 
@@ -111,7 +146,19 @@ public class BlockLabel : MonoBehaviour
             halfHeight = collider.bounds.size.y * 0.5f;
         }
 
-        labelObject.transform.localPosition = Vector3.up * (halfHeight + heightAboveTop);
+        _text.transform.localPosition = Vector3.up * (halfHeight + heightAboveTop);
+    }
+
+    private void OnValidate()
+    {
+        if (_text == null)
+        {
+            return;
+        }
+
+        _text.fontSize = fontSize;
+        UpdatePosition();
+        RefreshLabel();
     }
 
     private void HandleColorChanged(Block block)
