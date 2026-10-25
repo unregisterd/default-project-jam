@@ -11,17 +11,18 @@ public class BlockIconManager : MonoBehaviour
     [SerializeField] private int columns = 2;
     [SerializeField] private int rows = 2;
 
-    [Header("图标索引（按从左到右、从上到下的顺序）")]
+    [Header("图标索引（从左到右、从上到下）")]
     [SerializeField] private int lockIndex;
     [SerializeField] private int arrowIndex = 1;
     [SerializeField] private int loopIndex = 2;
 
-    [Header("贴片")]
-    [Tooltip("图标占方块顶面的比例")]
-    [Range(0.1f, 1f)]
-    [SerializeField] private float sizeScale = 0.62f;
-    [Tooltip("贴片离顶面的高度，避免 z-fighting")]
-    [SerializeField] private float heightOffset = 0.012f;
+    [Header("摆放")]
+    [Tooltip("Billboard = 竖着面向玩家；FlatOnTop = 平贴顶面")]
+    [SerializeField] private BlockIconMode mode = BlockIconMode.Billboard;
+    [Tooltip("图标边长（米）")]
+    [SerializeField] private float iconSize = 0.55f;
+    [Tooltip("图标底部离方块顶面的高度（米）")]
+    [SerializeField] private float heightAboveTop = 0.12f;
 
     private void Start()
     {
@@ -63,8 +64,9 @@ public class BlockIconManager : MonoBehaviour
                 columns,
                 rows,
                 ResolveIconIndex(block.Type),
-                sizeScale,
-                heightOffset);
+                mode,
+                iconSize,
+                heightAboveTop);
         }
     }
 

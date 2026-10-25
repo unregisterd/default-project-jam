@@ -1,6 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum BlockIconMode
+{
+    Billboard = 0,
+    FlatOnTop = 1,
+}
+
 [DisallowMultipleComponent]
 public class BlockIconVisual : MonoBehaviour
 {
@@ -9,18 +15,37 @@ public class BlockIconVisual : MonoBehaviour
     private Block _block;
     private MeshRenderer _renderer;
     private Transform _quad;
-    private float _sizeScale = 0.62f;
-    private float _heightOffset = 0.012f;
+    private BlockIconMode _mode = BlockIconMode.Billboard;
+    private float _size = 0.55f;
+    private float _heightAboveTop = 0.15f;
 
     private void Awake()
     {
         _block = GetComponent<Block>();
     }
 
-    public void Apply(Texture2D atlas, int columns, int rows, int iconIndex, float sizeScale, float heightOffset)
+    private void LateUpdate()
     {
-        _sizeScale = sizeScale;
-        _heightOffset = heightOffset;
+        if (_quad == null || _mode != BlockIconMode.Billboard)
+        {
+            return;
+        }
+
+        Camera camera = Camera.main;
+
+        if (camera == null)
+        {
+            return;
+        }
+
+        _quad.rotation = camera.transform.rotation;
+    }
+
+    public void Apply(Texture2D atlas, int columns, int rows, int iconIndex, BlockIconMode mode, float size, float heightAboveTop)
+    {
+        _mode = mode;
+        _size = size;
+        _heightAboveTop = heightAboveTop;
 
         BuildQuad();
         UpdateQuadTransform();
@@ -38,7 +63,6 @@ public class BlockIconVisual : MonoBehaviour
         GameObject quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
         quad.name = "Icon";
         quad.transform.SetParent(transform, false);
-        quad.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
 
         Collider collider = quad.GetComponent<Collider>();
 
@@ -65,15 +89,19 @@ public class BlockIconVisual : MonoBehaviour
             return;
         }
 
-        Vector3 footprint = GetFootprint();
-        _quad.localScale = new Vector3(footprint.x * _sizeScale, footprint.z * _sizeScale, 1f);
-        _quad.localPosition = new Vector3(0f, GetHalfHeight() + _heightOffset, 0f);
-    }
+        float halfHeight = GetHalfHeight();
+        _quad.localScale = new Vector3(_size, _size, 1f);
 
-    private Vector3 GetFootprint()
-    {
-        Collider collider = GetComponentInChildren<Collider>();
-        return collider != null ? collider.bounds.size : new Vector3(2f, 2f, 2f);
+        if (_mode == BlockIconMode.FlatOnTop)
+        {
+            _quad.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            _quad.localPosition = new Vector3(0f, halfHeight + 0.012f, 0f);
+        }
+        else
+        {
+            _quad.localRotation = Quaternion.identity;
+            _quad.localPosition = new Vector3(0f, halfHeight + _heightAboveTop + _size * 0.5f, 0f);
+        }
     }
 
     private float GetHalfHeight()
