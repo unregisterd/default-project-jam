@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerBlockAgent : MonoBehaviour
 {
     [Tooltip("留空则自动获取")]
+    [SerializeField] private PlayerInputReader input;
     [SerializeField] private FirstPersonMotor motor;
     [SerializeField] private PlayerColorSelector colorSelector;
     [SerializeField] private LayerMask groundMask = ~0;
@@ -15,12 +16,16 @@ public class PlayerBlockAgent : MonoBehaviour
     [Tooltip("掉到这个高度以下就回到上一个安全位置")]
     [SerializeField] private float fallRespawnY = -12f;
     [SerializeField] private float respawnAboveTop = 0.08f;
+    [Tooltip("原地跳（按空格起跳并落回同一块）时是否翻开脚下方块")]
+    [SerializeField] private bool flipOnInPlaceJump = true;
 
     private CharacterController _controller;
     private Block _standingBlock;
     private Block _sourceBlock;
     private string _sourceColorId;
     private bool _airborne;
+    private bool _jumpInitiated;
+    private bool _leftGroundByJump;
     private float _lastGroundedTime;
     private Vector3 _lastSafePosition;
 
@@ -33,6 +38,11 @@ public class PlayerBlockAgent : MonoBehaviour
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
+
+        if (input == null)
+        {
+            input = GetComponent<PlayerInputReader>();
+        }
 
         if (motor == null)
         {
@@ -67,6 +77,11 @@ public class PlayerBlockAgent : MonoBehaviour
                 return;
             }
 
+            if (input != null && input.JumpPressed)
+            {
+                _jumpInitiated = true;
+            }
+
             Block under = ProbeBlock();
 
             if (under != null)
@@ -89,6 +104,8 @@ public class PlayerBlockAgent : MonoBehaviour
         _airborne = true;
         _sourceBlock = _standingBlock;
         _sourceColorId = _sourceBlock != null ? _sourceBlock.CurrentColorId : null;
+        _leftGroundByJump = _jumpInitiated;
+        _jumpInitiated = false;
     }
 
     private void ResolveLanding()
@@ -103,6 +120,12 @@ public class PlayerBlockAgent : MonoBehaviour
 
         if (landed == _sourceBlock)
         {
+            if (flipOnInPlaceJump && _leftGroundByJump && landed != null)
+            {
+                landed.TryAdvance();
+                LandingResolved?.Invoke(landed, landed);
+            }
+
             _standingBlock = landed;
             ClearSource();
             return;
@@ -142,6 +165,7 @@ public class PlayerBlockAgent : MonoBehaviour
     {
         _sourceBlock = null;
         _sourceColorId = null;
+        _leftGroundByJump = false;
     }
 
     private Block ProbeBlock()
@@ -191,6 +215,7 @@ public class PlayerBlockAgent : MonoBehaviour
         _standingBlock = null;
         ClearSource();
         _airborne = false;
+        _jumpInitiated = false;
         _lastGroundedTime = Time.time;
         _lastSafePosition = position;
     }
