@@ -62,6 +62,21 @@ public class FirstPersonMotor : MonoBehaviour
         _controller.Move(motion * dt);
     }
 
+
+    public bool IsGrounded => _controller != null && _controller.isGrounded;
+
+    public void Launch(float height, float forwardSpeed)
+    {
+        float safeHeight = Mathf.Max(0.05f, height);
+        _verticalVelocity = Mathf.Sqrt(2f * safeHeight * -gravity);
+
+        if (forwardSpeed > 0f)
+        {
+            Vector3 forward = transform.forward;
+            _planarVelocity = new Vector3(forward.x * forwardSpeed, 0f, forward.z * forwardSpeed);
+        }
+    }
+
     public void Teleport(Vector3 position)
     {
         _planarVelocity = Vector3.zero;
