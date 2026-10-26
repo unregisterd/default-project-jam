@@ -16,11 +16,11 @@ MonoBehaviour:
   - id: Red
     displayName: "\u7EA2"
     uiColor: {r: 0.85, g: 0.3, b: 0.28, a: 1}
-    material: {fileID: 2100000, guid: c787ffdeafdde4040b8553d7e5bb66a8, type: 2}
+    material: {fileID: 2100000, guid: d606afb81391df649a94b937259d6d4a, type: 2}
   - id: Blue
     displayName: "\u84DD"
     uiColor: {r: 0.35, g: 0.55, b: 0.95, a: 1}
-    material: {fileID: 2100000, guid: 88c2eb023aed185438b1940d04ab7992, type: 2}
+    material: {fileID: 2100000, guid: 81108883c66c1bd4c9529436f8df2c9b, type: 2}
   - id: Gray
     displayName: "\u7070"
     uiColor: {r: 0.55, g: 0.56, b: 0.58, a: 1}
