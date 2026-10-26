@@ -22,6 +22,17 @@ public class HopeAbility : MonoBehaviour, IAbility
     public AbilityType Type => AbilityType.Hope;
     public int Cost => 2;
 
+    public void Configure(GameObject prefab, BlockType type, BlockPalette blockPalette, float forward, float up, float lifeTime, float blinkSeconds)
+    {
+        platformPrefab = prefab;
+        platformType = type;
+        palette = blockPalette;
+        forwardDistance = forward;
+        upOffset = up;
+        lifetime = Mathf.Max(0.5f, lifeTime);
+        blinkTime = Mathf.Clamp(blinkSeconds, 0f, lifetime);
+    }
+
     public bool CanUse(out string reason)
     {
         reason = null;

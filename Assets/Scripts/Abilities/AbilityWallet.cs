@@ -62,6 +62,14 @@ public class AbilityWallet : MonoBehaviour
         return true;
     }
 
+    public void Configure(int newMaxPoints, int newStartPoints)
+    {
+        maxPoints = Mathf.Max(1, newMaxPoints);
+        startPoints = newStartPoints;
+        Points = Mathf.Clamp(startPoints, 0, maxPoints);
+        Changed?.Invoke(Points, maxPoints);
+    }
+
     public void SetPoints(int value)
     {
         Points = Mathf.Clamp(value, 0, maxPoints);

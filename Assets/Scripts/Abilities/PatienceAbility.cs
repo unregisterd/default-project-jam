@@ -31,7 +31,18 @@ public class PatienceAbility : MonoBehaviour, IAbility
         if (pillarVisual == null)
         {
             pillarVisual = GetComponent<RaisePillarVisual>();
+
+            if (pillarVisual == null)
+            {
+                pillarVisual = gameObject.AddComponent<RaisePillarVisual>();
+            }
         }
+    }
+
+    public void Configure(float height, float riseDuration)
+    {
+        riseHeight = height;
+        duration = Mathf.Max(0.05f, riseDuration);
     }
 
     public bool CanUse(out string reason)

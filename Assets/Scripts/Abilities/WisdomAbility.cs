@@ -14,6 +14,11 @@ public class WisdomAbility : MonoBehaviour, IAbility
         RefreshBlocks();
     }
 
+    public void Configure(float newRadius)
+    {
+        radius = newRadius;
+    }
+
     public bool CanUse(out string reason)
     {
         if (_blocks == null || _blocks.Length == 0)

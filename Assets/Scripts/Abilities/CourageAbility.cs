@@ -19,6 +19,12 @@ public class CourageAbility : MonoBehaviour, IAbility
         }
     }
 
+    public void Configure(float height, float speed)
+    {
+        jumpHeight = height;
+        forwardSpeed = speed;
+    }
+
     public bool CanUse(out string reason)
     {
         if (motor == null)

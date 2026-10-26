@@ -1,17 +1,52 @@
 ﻿using System;
 using UnityEngine;
 
+[DisallowMultipleComponent]
 public class AbilityController : MonoBehaviour
 {
     [SerializeField] private PlayerInputReader input;
-    [SerializeField] private AbilityWallet wallet;
-    [SerializeField] private CourageAbility courage;
-    [SerializeField] private PatienceAbility patience;
-    [SerializeField] private HopeAbility hope;
-    [SerializeField] private WisdomAbility wisdom;
+
+    [Header("星光池")]
+    [SerializeField] private int maxPoints = 4;
+    [SerializeField] private int startPoints;
+    [Tooltip("每个技能的全局冷却")]
     [SerializeField] private float cooldown = 0.6f;
 
+    [Header("勇气")]
+    [SerializeField] private float courageHeight = 3f;
+    [SerializeField] private float courageForwardSpeed = 2f;
+
+    [Header("耐心")]
+    [SerializeField] private float patienceRiseHeight = 2f;
+    [SerializeField] private float patienceDuration = 1f;
+
+    [Header("希望")]
+    [SerializeField] private GameObject hopePlatformPrefab;
+    [SerializeField] private BlockType hopePlatformType;
+    [SerializeField] private float hopeForwardDistance = 2.5f;
+    [SerializeField] private float hopeUpOffset = 0.8f;
+    [SerializeField] private float hopeLifetime = 10f;
+    [SerializeField] private float hopeBlinkTime = 2f;
+
+    [Header("智慧")]
+    [SerializeField] private float wisdomRadius = 12f;
+
+    [Header("方块外观")]
+    [Tooltip("希望平台 / 隐藏块用的调色板")]
+    [SerializeField] private BlockPalette palette;
+
+    [Header("调试")]
+    [Tooltip("自动挂一个临时 HUD，方便看星光数")]
+    [SerializeField] private bool showDebugHud = true;
+
+    private AbilityWallet _wallet;
+    private CourageAbility _courage;
+    private PatienceAbility _patience;
+    private HopeAbility _hope;
+    private WisdomAbility _wisdom;
     private float _nextUseTime;
+
+    public AbilityWallet Wallet => _wallet;
 
     public event Action<AbilityType> Used;
     public event Action<AbilityType, string> Rejected;
@@ -23,29 +58,24 @@ public class AbilityController : MonoBehaviour
             input = GetComponent<PlayerInputReader>();
         }
 
-        if (wallet == null)
-        {
-            wallet = GetComponent<AbilityWallet>();
-        }
+        _wallet = EnsureComponent(_wallet);
+        _wallet.Configure(maxPoints, startPoints);
 
-        if (courage == null)
-        {
-            courage = GetComponent<CourageAbility>();
-        }
+        _courage = EnsureComponent(_courage);
+        _courage.Configure(courageHeight, courageForwardSpeed);
 
-        if (patience == null)
-        {
-            patience = GetComponent<PatienceAbility>();
-        }
+        _patience = EnsureComponent(_patience);
+        _patience.Configure(patienceRiseHeight, patienceDuration);
 
-        if (hope == null)
-        {
-            hope = GetComponent<HopeAbility>();
-        }
+        _hope = EnsureComponent(_hope);
+        _hope.Configure(hopePlatformPrefab, hopePlatformType, palette, hopeForwardDistance, hopeUpOffset, hopeLifetime, hopeBlinkTime);
 
-        if (wisdom == null)
+        _wisdom = EnsureComponent(_wisdom);
+        _wisdom.Configure(wisdomRadius);
+
+        if (showDebugHud && GetComponent<Hud_StarEnergy>() == null)
         {
-            wisdom = GetComponent<WisdomAbility>();
+            gameObject.AddComponent<Hud_StarEnergy>();
         }
     }
 
@@ -58,22 +88,22 @@ public class AbilityController : MonoBehaviour
 
         if (input.Ability1Pressed)
         {
-            TryUse(courage);
+            TryUse(_courage);
         }
 
         if (input.Ability2Pressed)
         {
-            TryUse(patience);
+            TryUse(_patience);
         }
 
         if (input.Ability3Pressed)
         {
-            TryUse(hope);
+            TryUse(_hope);
         }
 
         if (input.Ability4Pressed)
         {
-            TryUse(wisdom);
+            TryUse(_wisdom);
         }
     }
 
@@ -96,7 +126,7 @@ public class AbilityController : MonoBehaviour
             return false;
         }
 
-        if (wallet == null || !wallet.TrySpend(ability.Cost))
+        if (_wallet == null || !_wallet.TrySpend(ability.Cost))
         {
             Rejected?.Invoke(ability.Type, "星光不足");
             return false;
@@ -106,5 +136,22 @@ public class AbilityController : MonoBehaviour
         _nextUseTime = Time.time + cooldown;
         Used?.Invoke(ability.Type);
         return true;
+    }
+
+    private T EnsureComponent<T>(T current) where T : Component
+    {
+        if (current != null)
+        {
+            return current;
+        }
+
+        T found = GetComponent<T>();
+
+        if (found != null)
+        {
+            return found;
+        }
+
+        return gameObject.AddComponent<T>();
     }
 }
