@@ -6,6 +6,11 @@ public class BlockView_Whitebox : BlockView
 
     private void Reset()
     {
+        CollectRenderers();
+    }
+
+    public void CollectRenderers()
+    {
         renderers = GetComponentsInChildren<Renderer>(true);
     }
 

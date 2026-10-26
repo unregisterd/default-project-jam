@@ -1,0 +1,291 @@
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+
+public static class BlockArtPipeline
+{
+    private const string BlocksRoot = "Assets/Art/Blocks";
+    private const string MaterialFolder = "Assets/Art/Materials";
+    private const string PrefabPath = "Assets/Prefabs/Blocks/Block_Art.prefab";
+    private const string PalettePath = "Assets/Settings/BlockPalette.asset";
+
+    [MenuItem("Tools/Art/Build Art Materials")]
+    public static void BuildArtMaterials()
+    {
+        EnsureFolder(MaterialFolder);
+
+        foreach (string color in new[] { "Red", "Blue" })
+        {
+            BuildMaterial(color);
+        }
+
+        AssetDatabase.SaveAssets();
+        Debug.Log("[ArtPipe] 材质生成完成：M_Block_Red_Art / M_Block_Blue_Art");
+    }
+
+    [MenuItem("Tools/Art/Build Block Art Prefab")]
+    public static void BuildArtPrefab()
+    {
+        string modelPath = $"{BlocksRoot}/Blue/SM_Block_Blue.fbx";
+        GameObject modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+
+        if (modelAsset == null)
+        {
+            Debug.LogError($"[ArtPipe] 找不到模型 {modelPath}");
+            return;
+        }
+
+        if (!EditorUtility.DisplayDialog(
+                "美术方块预制体",
+                $"用 {modelPath} 生成 {PrefabPath}？\n已存在的同名预制体会被覆盖。",
+                "生成",
+                "取消"))
+        {
+            return;
+        }
+
+        GameObject root = new GameObject("Block_Art");
+
+        GameObject model = (GameObject)PrefabUtility.InstantiatePrefab(modelAsset);
+        model.name = "Model";
+        model.transform.SetParent(root.transform, false);
+
+        Bounds bounds = CalculateBounds(model);
+        Vector3 size = bounds.size;
+        Vector3 targetSize = Vector3.one;
+
+        model.transform.localScale = new Vector3(
+            targetSize.x / Mathf.Max(size.x, 0.0001f),
+            targetSize.y / Mathf.Max(size.y, 0.0001f),
+            targetSize.z / Mathf.Max(size.z, 0.0001f));
+
+        model.transform.localPosition = -bounds.center;
+
+        BoxCollider collider = root.AddComponent<BoxCollider>();
+        collider.center = Vector3.zero;
+        collider.size = Vector3.one;
+
+        Block block = root.AddComponent<Block>();
+        BlockView_Whitebox view = root.AddComponent<BlockView_Whitebox>();
+        view.CollectRenderers();
+        block.SetView(view);
+
+        BlockPalette palette = AssetDatabase.LoadAssetAtPath<BlockPalette>(PalettePath);
+
+        if (palette != null)
+        {
+            block.SetPalette(palette);
+        }
+
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
+        Material blueMaterial = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialFolder}/M_Block_Blue_Art.mat");
+
+        if (blueMaterial != null)
+        {
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.sharedMaterial = blueMaterial;
+            }
+        }
+
+        EnsureFolder("Assets/Prefabs/Blocks");
+        PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
+        Object.DestroyImmediate(root);
+        AssetDatabase.SaveAssets();
+
+        Debug.Log($"[ArtPipe] 已生成 {PrefabPath}（模型尺寸归一化到 1×1×1，碰撞体 1m）");
+    }
+
+    [MenuItem("Tools/Art/Palette -> Art Materials")]
+    public static void SwitchPaletteToArt()
+    {
+        SetPaletteSuffix("_Art");
+    }
+
+    [MenuItem("Tools/Art/Palette -> Flat Materials")]
+    public static void SwitchPaletteToFlat()
+    {
+        SetPaletteSuffix(string.Empty);
+    }
+
+    private static void SetPaletteSuffix(string suffix)
+    {
+        BlockPalette palette = AssetDatabase.LoadAssetAtPath<BlockPalette>(PalettePath);
+
+        if (palette == null)
+        {
+            Debug.LogError($"[ArtPipe] 找不到 {PalettePath}");
+            return;
+        }
+
+        BlockColorDefinition[] colors = palette.Colors;
+
+        foreach (BlockColorDefinition definition in colors)
+        {
+            string materialPath = $"{MaterialFolder}/M_Block_{definition.id}{suffix}.mat";
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+
+            if (material == null)
+            {
+                Debug.LogWarning($"[ArtPipe] 缺少材质 {materialPath}，{definition.id} 保持不变");
+                continue;
+            }
+
+            definition.material = material;
+        }
+
+        palette.SetColors(colors);
+        EditorUtility.SetDirty(palette);
+        AssetDatabase.SaveAssets();
+        Debug.Log($"[ArtPipe] 调色板已切换到 {(string.IsNullOrEmpty(suffix) ? "纯色" : "美术")} 材质");
+    }
+
+    private static void BuildMaterial(string color)
+    {
+        string folder = $"{BlocksRoot}/{color}";
+        string materialPath = $"{MaterialFolder}/M_Block_{color}_Art.mat";
+
+        Texture2D baseColor = FindTexture(folder, "basecolor");
+        Texture2D normal = FindTexture(folder, "normal");
+        Texture2D metallic = FindTexture(folder, "metallic");
+        Texture2D roughness = FindTexture(folder, "roughness");
+
+        float metallicValue = metallic != null ? SampleAverage(metallic).r : 0f;
+        float roughnessValue = roughness != null ? SampleAverage(roughness).r : 0.6f;
+
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
+
+        if (material == null)
+        {
+            Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+
+            if (shader == null)
+            {
+                Debug.LogError("[ArtPipe] 找不到 URP Lit shader");
+                return;
+            }
+
+            material = new Material(shader);
+            AssetDatabase.CreateAsset(material, materialPath);
+        }
+
+        if (baseColor != null)
+        {
+            material.SetTexture("_BaseMap", baseColor);
+            material.SetColor("_BaseColor", Color.white);
+        }
+
+        if (normal != null)
+        {
+            material.SetTexture("_BumpMap", normal);
+            material.EnableKeyword("_NORMALMAP");
+        }
+
+        material.SetFloat("_Metallic", Mathf.Clamp01(metallicValue));
+        material.SetFloat("_Smoothness", Mathf.Clamp01(1f - roughnessValue));
+        material.enableInstancing = true;
+        EditorUtility.SetDirty(material);
+
+        Debug.Log(
+            $"[ArtPipe] {materialPath}  baseColor={(baseColor != null)} normal={(normal != null)} "
+            + $"metallic={metallicValue:F2} smoothness={(1f - roughnessValue):F2}");
+    }
+
+    private static Texture2D FindTexture(string folder, string keyword)
+    {
+        string[] guids = AssetDatabase.FindAssets("t:Texture2D", new[] { folder });
+
+        foreach (string guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+
+            if (Path.GetFileNameWithoutExtension(path).ToLowerInvariant().Contains(keyword))
+            {
+                return AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+            }
+        }
+
+        return null;
+    }
+
+    private static Color SampleAverage(Texture2D texture)
+    {
+        string path = AssetDatabase.GetAssetPath(texture);
+        TextureImporter importer = AssetImporter.GetAtPath(path) as TextureImporter;
+
+        if (importer == null)
+        {
+            return new Color(0.5f, 0.5f, 0.5f, 1f);
+        }
+
+        bool wasReadable = importer.isReadable;
+
+        if (!wasReadable)
+        {
+            importer.isReadable = true;
+            importer.SaveAndReimport();
+            texture = AssetDatabase.LoadAssetAtPath<Texture2D>(path);
+        }
+
+        Color average = new Color(0f, 0f, 0f, 0f);
+
+        if (texture != null)
+        {
+            Color[] pixels = texture.GetPixels();
+
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                average += pixels[i];
+            }
+
+            average /= Mathf.Max(1, pixels.Length);
+        }
+
+        if (!wasReadable)
+        {
+            importer.isReadable = false;
+            importer.SaveAndReimport();
+        }
+
+        return average;
+    }
+
+    private static Bounds CalculateBounds(GameObject root)
+    {
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
+
+        if (renderers.Length == 0)
+        {
+            return new Bounds(Vector3.zero, Vector3.one);
+        }
+
+        Bounds bounds = renderers[0].bounds;
+
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+
+        Vector3 center = bounds.center - root.transform.position;
+        return new Bounds(center, bounds.size);
+    }
+
+    private static void EnsureFolder(string folderPath)
+    {
+        if (AssetDatabase.IsValidFolder(folderPath))
+        {
+            return;
+        }
+
+        string parent = Path.GetDirectoryName(folderPath)?.Replace('\\', '/');
+        string leaf = Path.GetFileName(folderPath);
+
+        if (string.IsNullOrEmpty(parent))
+        {
+            return;
+        }
+
+        EnsureFolder(parent);
+        AssetDatabase.CreateFolder(parent, leaf);
+    }
+}
