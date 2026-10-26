@@ -2,6 +2,7 @@
 using UnityEngine;
 
 [DisallowMultipleComponent]
+[RequireComponent(typeof(Block))]
 public class HiddenBlock : MonoBehaviour
 {
     [SerializeField] private Renderer[] renderers = new Renderer[0];
