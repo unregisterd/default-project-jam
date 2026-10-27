@@ -12,26 +12,23 @@ public static class ParticleSetup
     public static void Setup()
     {
         Texture2D soft = GetOrCreateSoftCircle();
+
         Material cloudMaterial = GetOrCreateMaterial("M_FX_Cloud", soft, new Color(0.82f, 0.84f, 0.92f, 0.10f), false);
-        Material sparkMaterial = GetOrCreateMaterial("M_FX_Spark", soft, new Color(1f, 0.86f, 0.55f, 0.85f), true);
+        Material dustMaterial = GetOrCreateMaterial("M_FX_Dust", soft, new Color(0.9f, 0.94f, 1f, 0.75f), true);
+        Material burstMaterial = GetOrCreateMaterial("M_FX_Burst", soft, new Color(0.92f, 0.94f, 1f, 0.8f), true);
 
         CreateCloudSea(cloudMaterial);
-        CreateDust(sparkMaterial);
-        CreateLandingBurst(sparkMaterial);
+        CreateDust(dustMaterial);
+        CreateLandingBurst(burstMaterial);
         AttachLandingComponent();
 
         AssetDatabase.SaveAssets();
-        Debug.Log("[FX] 已创建：云海、漂浮微尘（随高度变色）、落地爆发");
+        Debug.Log("[FX] 已创建：云海（圆形软雾）、漂浮微尘（冷白）、落地爆发（小颗粒）");
     }
 
     private static void CreateCloudSea(Material material)
     {
-        GameObject existing = GameObject.Find("FX_CloudSea");
-
-        if (existing != null)
-        {
-            Object.DestroyImmediate(existing);
-        }
+        RemoveIfExists("FX_CloudSea");
 
         GameObject go = new GameObject("FX_CloudSea");
         go.transform.position = new Vector3(0f, -8f, 0f);
@@ -39,15 +36,15 @@ public static class ParticleSetup
         ParticleSystem particles = go.AddComponent<ParticleSystem>();
         ParticleSystem.MainModule main = particles.main;
         main.loop = true;
-        main.startLifetime = 45f;
-        main.startSpeed = 0.08f;
-        main.startSize = new ParticleSystem.MinMaxCurve(12f, 26f);
-        main.startColor = new Color(0.85f, 0.87f, 0.95f, 0.18f);
-        main.maxParticles = 90;
+        main.startLifetime = 50f;
+        main.startSpeed = 0.05f;
+        main.startSize = new ParticleSystem.MinMaxCurve(14f, 30f);
+        main.startColor = new Color(0.85f, 0.87f, 0.95f, 0.16f);
+        main.maxParticles = 80;
         main.simulationSpace = ParticleSystemSimulationSpace.World;
 
         ParticleSystem.EmissionModule emission = particles.emission;
-        emission.rateOverTime = 2.5f;
+        emission.rateOverTime = 2f;
 
         ParticleSystem.ShapeModule shape = particles.shape;
         shape.shapeType = ParticleSystemShapeType.Box;
@@ -55,14 +52,13 @@ public static class ParticleSetup
 
         ParticleSystem.NoiseModule noise = particles.noise;
         noise.enabled = true;
-        noise.strength = 0.35f;
-        noise.frequency = 0.08f;
-        noise.scrollSpeed = 0.03f;
+        noise.strength = 0.3f;
+        noise.frequency = 0.06f;
+        noise.scrollSpeed = 0.02f;
 
         ParticleSystemRenderer renderer = go.GetComponent<ParticleSystemRenderer>();
-        renderer.renderMode = ParticleSystemRenderMode.Stretch;
-        renderer.velocityScale = 4f;
-        renderer.material = material;
+        renderer.renderMode = ParticleSystemRenderMode.Billboard;
+        renderer.sharedMaterial = material;
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
         particles.Play();
@@ -70,12 +66,7 @@ public static class ParticleSetup
 
     private static void CreateDust(Material material)
     {
-        GameObject existing = GameObject.Find("FX_Dust");
-
-        if (existing != null)
-        {
-            Object.DestroyImmediate(existing);
-        }
+        RemoveIfExists("FX_Dust");
 
         GameObject go = new GameObject("FX_Dust");
         GameObject pivot = GameObject.Find("CameraPivot");
@@ -91,15 +82,15 @@ public static class ParticleSetup
         main.loop = true;
         main.prewarm = true;
         main.startLifetime = 9f;
-        main.startSpeed = 0.12f;
-        main.startSize = new ParticleSystem.MinMaxCurve(0.05f, 0.13f);
-        main.startColor = new Color(1f, 0.75f, 0.4f, 0.9f);
-        main.maxParticles = 180;
+        main.startSpeed = 0.1f;
+        main.startSize = new ParticleSystem.MinMaxCurve(0.035f, 0.08f);
+        main.startColor = new Color(0.92f, 0.95f, 1f, 0.85f);
+        main.maxParticles = 160;
         main.simulationSpace = ParticleSystemSimulationSpace.World;
         main.gravityModifier = 0f;
 
         ParticleSystem.EmissionModule emission = particles.emission;
-        emission.rateOverTime = 14f;
+        emission.rateOverTime = 16f;
 
         ParticleSystem.ShapeModule shape = particles.shape;
         shape.shapeType = ParticleSystemShapeType.Sphere;
@@ -110,37 +101,30 @@ public static class ParticleSetup
 
         Gradient gradient = new Gradient();
         gradient.SetKeys(
-            new[]
-            {
-                new GradientColorKey(Color.white, 0f),
-                new GradientColorKey(Color.white, 1f),
-            },
+            new[] { new GradientColorKey(Color.white, 0f), new GradientColorKey(Color.white, 1f) },
             new[]
             {
                 new GradientAlphaKey(0f, 0f),
-                new GradientAlphaKey(1f, 0.2f),
-                new GradientAlphaKey(1f, 0.8f),
+                new GradientAlphaKey(1f, 0.25f),
+                new GradientAlphaKey(1f, 0.75f),
                 new GradientAlphaKey(0f, 1f),
             });
         colorOverLifetime.color = new ParticleSystem.MinMaxGradient(gradient);
 
         ParticleSystemRenderer renderer = go.GetComponent<ParticleSystemRenderer>();
         renderer.renderMode = ParticleSystemRenderMode.Billboard;
-        renderer.material = material;
+        renderer.sharedMaterial = material;
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
-        go.AddComponent<ParticleHeightTint>();
+        ParticleHeightTint tint = go.AddComponent<ParticleHeightTint>();
+        SetTintColors(tint, new Color(1f, 0.95f, 0.85f), new Color(0.55f, 0.7f, 1f));
+
         particles.Play();
     }
 
     private static void CreateLandingBurst(Material material)
     {
-        GameObject existing = GameObject.Find("FX_LandingBurst");
-
-        if (existing != null)
-        {
-            Object.DestroyImmediate(existing);
-        }
+        RemoveIfExists("FX_LandingBurst");
 
         GameObject go = new GameObject("FX_LandingBurst");
 
@@ -148,27 +132,27 @@ public static class ParticleSetup
         ParticleSystem.MainModule main = particles.main;
         main.loop = false;
         main.playOnAwake = false;
-        main.startLifetime = 0.45f;
-        main.startSpeed = new ParticleSystem.MinMaxCurve(1.4f, 2.8f);
-        main.startSize = new ParticleSystem.MinMaxCurve(0.06f, 0.16f);
-        main.startColor = new Color(1f, 0.9f, 0.7f, 0.9f);
-        main.maxParticles = 60;
+        main.startLifetime = 0.35f;
+        main.startSpeed = new ParticleSystem.MinMaxCurve(0.8f, 1.6f);
+        main.startSize = new ParticleSystem.MinMaxCurve(0.025f, 0.06f);
+        main.startColor = new Color(0.9f, 0.93f, 1f, 0.85f);
+        main.maxParticles = 40;
         main.simulationSpace = ParticleSystemSimulationSpace.World;
-        main.gravityModifier = 0.35f;
+        main.gravityModifier = 0.4f;
 
         ParticleSystem.EmissionModule emission = particles.emission;
         emission.rateOverTime = 0f;
-        emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 14) });
+        emission.SetBursts(new[] { new ParticleSystem.Burst(0f, 10) });
 
         ParticleSystem.ShapeModule shape = particles.shape;
         shape.shapeType = ParticleSystemShapeType.Cone;
-        shape.angle = 32f;
-        shape.radius = 0.12f;
+        shape.angle = 30f;
+        shape.radius = 0.08f;
         shape.rotation = new Vector3(-90f, 0f, 0f);
 
         ParticleSystemRenderer renderer = go.GetComponent<ParticleSystemRenderer>();
         renderer.renderMode = ParticleSystemRenderMode.Billboard;
-        renderer.material = material;
+        renderer.sharedMaterial = material;
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
 
         particles.Stop();
@@ -186,6 +170,24 @@ public static class ParticleSetup
         if (player.GetComponent<PlayerLandingParticles>() == null)
         {
             player.AddComponent<PlayerLandingParticles>();
+        }
+    }
+
+    private static void SetTintColors(ParticleHeightTint tint, Color low, Color high)
+    {
+        SerializedObject serialized = new SerializedObject(tint);
+        serialized.FindProperty("lowColor").colorValue = low;
+        serialized.FindProperty("highColor").colorValue = high;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    private static void RemoveIfExists(string objectName)
+    {
+        GameObject existing = GameObject.Find(objectName);
+
+        if (existing != null)
+        {
+            Object.DestroyImmediate(existing);
         }
     }
 
@@ -212,7 +214,7 @@ public static class ParticleSetup
                 float dy = (y + 0.5f) / size * 2f - 1f;
                 float distance = Mathf.Sqrt(dx * dx + dy * dy);
                 float alpha = Mathf.Clamp01(1f - distance);
-                alpha = alpha * alpha;
+                alpha = alpha * alpha * alpha;
                 pixels[y * size + x] = new Color(1f, 1f, 1f, alpha);
             }
         }
@@ -260,6 +262,7 @@ public static class ParticleSetup
         }
 
         material.SetTexture("_BaseMap", texture);
+        material.SetTexture("_MainTex", texture);
         material.SetColor("_BaseColor", color);
         material.SetFloat("_Surface", 1f);
         material.SetFloat("_Blend", additive ? 1f : 0f);

@@ -1,11 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ParticleHeightTint : MonoBehaviour
 {
     [SerializeField] private Transform player;
     [SerializeField] private float maxHeight = 120f;
-    [SerializeField] private Color lowColor = new Color(1f, 0.65f, 0.3f);
-    [SerializeField] private Color highColor = new Color(0.35f, 0.5f, 1f);
+    [SerializeField] private Color lowColor = new Color(1f, 0.95f, 0.85f);
+    [SerializeField] private Color highColor = new Color(0.55f, 0.7f, 1f);
 
     private ParticleSystem _particles;
     private ParticleSystem.MainModule _main;
