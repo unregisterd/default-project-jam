@@ -31,20 +31,20 @@ public static class ParticleSetup
         RemoveIfExists("FX_CloudSea");
 
         GameObject go = new GameObject("FX_CloudSea");
-        go.transform.position = new Vector3(0f, -8f, 0f);
+        go.transform.position = new Vector3(0f, -22f, 0f);
 
         ParticleSystem particles = go.AddComponent<ParticleSystem>();
         ParticleSystem.MainModule main = particles.main;
         main.loop = true;
         main.startLifetime = 50f;
         main.startSpeed = 0.05f;
-        main.startSize = new ParticleSystem.MinMaxCurve(14f, 30f);
-        main.startColor = new Color(0.85f, 0.87f, 0.95f, 0.16f);
-        main.maxParticles = 80;
+        main.startSize = new ParticleSystem.MinMaxCurve(7f, 16f);
+        main.startColor = new Color(0.85f, 0.87f, 0.95f, 0.10f);
+        main.maxParticles = 120;
         main.simulationSpace = ParticleSystemSimulationSpace.World;
 
         ParticleSystem.EmissionModule emission = particles.emission;
-        emission.rateOverTime = 2f;
+        emission.rateOverTime = 3.5f;
 
         ParticleSystem.ShapeModule shape = particles.shape;
         shape.shapeType = ParticleSystemShapeType.Box;

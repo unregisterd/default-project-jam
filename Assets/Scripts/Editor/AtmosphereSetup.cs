@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -51,13 +51,13 @@ public static class AtmosphereSetup
 
     private static VolumeProfile SetupProfile()
     {
-        VolumeProfile profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(ProfilePath);
-
-        if (profile == null)
+        if (AssetDatabase.LoadAssetAtPath<VolumeProfile>(ProfilePath) != null)
         {
-            profile = ScriptableObject.CreateInstance<VolumeProfile>();
-            AssetDatabase.CreateAsset(profile, ProfilePath);
+            AssetDatabase.DeleteAsset(ProfilePath);
         }
+
+        VolumeProfile profile = ScriptableObject.CreateInstance<VolumeProfile>();
+        AssetDatabase.CreateAsset(profile, ProfilePath);
 
         Bloom bloom = GetOrAdd<Bloom>(profile);
         bloom.intensity.Override(0.55f);
@@ -83,6 +83,10 @@ public static class AtmosphereSetup
             return existing;
         }
 
-        return profile.Add<T>(true);
+        T component = profile.Add<T>(true);
+        component.name = typeof(T).Name;
+        component.hideFlags = HideFlags.HideInHierarchy;
+        AssetDatabase.AddObjectToAsset(component, profile);
+        return component;
     }
 }
