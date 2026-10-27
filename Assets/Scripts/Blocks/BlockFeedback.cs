@@ -7,10 +7,10 @@ public class BlockFeedback : MonoBehaviour
     private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 
     [Tooltip("压扁幅度（0.12 = 12%）")]
-    [SerializeField] private float squashAmount = 0.2f;
-    [SerializeField] private float squashDuration = 0.25f;
+    [SerializeField] private float squashAmount = 0.12f;
+    [SerializeField] private float squashDuration = 0.18f;
     [Tooltip("自发光闪一下的强度")]
-    [SerializeField] private float flashIntensity = 2f;
+    [SerializeField] private float flashIntensity = 1.4f;
     [SerializeField] private float flashDuration = 0.25f;
 
     private Block _block;

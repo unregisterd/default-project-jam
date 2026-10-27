@@ -193,6 +193,8 @@ MonoBehaviour:
     m_Bits: 4294967295
   groundProbeDistance: 0.35
   fallRespawnY: -12
+  landingClip: {fileID: 0}
+  landingVolume: 0.7
 --- !u!114 &238314287
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,16 +302,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 238314289}
-  maxPoints: 4
-  startPoints: 4
+  maxPoints: 10
+  startPoints: 10
   cooldown: 0.6
   courageHeight: 3
   courageForwardSpeed: 2
   patienceRiseHeight: 2
   patienceDuration: 1
-  hopePlatformPrefab: {fileID: 7984998423339048371, guid: da58321656346484ab7d4b81cbf8cd77,
+  hopePlatformPrefab: {fileID: 5650761920288148126, guid: 208521d680ad8c7459538520117dd535,
     type: 3}
-  hopePlatformType: {fileID: 11400000, guid: d22b8e70ec024ce438019bbefeda4505, type: 2}
+  hopePlatformType: {fileID: 11400000, guid: b6ff3457859fb58469f5f23ce4b0dcef, type: 2}
   hopeForwardDistance: 2.5
   hopeUpOffset: 0.8
   hopeLifetime: 10
