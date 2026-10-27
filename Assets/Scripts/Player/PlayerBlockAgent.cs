@@ -18,10 +18,20 @@ public class PlayerBlockAgent : MonoBehaviour
     [Range(0f, 1f)]
     [SerializeField] private float landingVolume = 0.7f;
 
+    [Header("走路脚步")]
+    [Tooltip("留空则复用落地音效")]
+    [SerializeField] private AudioClip stepClip;
+    [Tooltip("每走多少米响一次")]
+    [SerializeField] private float stepDistance = 2f;
+    [Range(0f, 1f)]
+    [SerializeField] private float stepVolume = 0.35f;
+
     private CharacterController _controller;
     private Block _standingBlock;
     private Vector3 _lastSafePosition;
     private AudioSource _audio;
+    private float _stepAccumulator;
+    private float _lastLandingTime = -10f;
     private bool _wasGrounded = true;
 
     public Block StandingBlock => _standingBlock;
@@ -52,6 +62,11 @@ public class PlayerBlockAgent : MonoBehaviour
         {
             landingClip = Resources.Load<AudioClip>("Audio/step_land");
         }
+
+        if (stepClip == null)
+        {
+            stepClip = landingClip;
+        }
     }
 
     private void Update()
@@ -71,8 +86,12 @@ public class PlayerBlockAgent : MonoBehaviour
         if (!_wasGrounded)
         {
             _wasGrounded = true;
+            _lastLandingTime = Time.time;
+            _stepAccumulator = stepDistance * 0.5f;
             PlayLandingFeedback();
         }
+
+        UpdateFootsteps();
 
         Block under = ProbeBlock();
 
@@ -149,6 +168,34 @@ public class PlayerBlockAgent : MonoBehaviour
         }
 
         PlayLandingSound();
+    }
+
+    private void UpdateFootsteps()
+    {
+        if (_audio == null || stepClip == null || Time.time - _lastLandingTime < 0.15f)
+        {
+            return;
+        }
+
+        Vector3 velocity = _controller.velocity;
+        velocity.y = 0f;
+        float speed = velocity.magnitude;
+
+        if (speed < 0.3f)
+        {
+            return;
+        }
+
+        _stepAccumulator += speed * Time.deltaTime;
+
+        if (_stepAccumulator < stepDistance)
+        {
+            return;
+        }
+
+        _stepAccumulator = 0f;
+        _audio.pitch = 0.92f + UnityEngine.Random.Range(0f, 0.16f);
+        _audio.PlayOneShot(stepClip, stepVolume);
     }
 
     private void PlayLandingSound()
