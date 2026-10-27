@@ -13,7 +13,7 @@ public class AbilityController : MonoBehaviour
     [SerializeField] private float cooldown = 0.6f;
 
     [Header("勇气")]
-    [SerializeField] private float courageHeight = 3f;
+    [SerializeField] private float courageHeight = 3.3f;
     [SerializeField] private float courageForwardSpeed = 2f;
 
     [Header("耐心")]

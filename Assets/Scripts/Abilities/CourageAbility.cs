@@ -4,7 +4,7 @@ public class CourageAbility : MonoBehaviour, IAbility
 {
     [SerializeField] private FirstPersonMotor motor;
     [Tooltip("跳跃高度（米）")]
-    [SerializeField] private float jumpHeight = 3f;
+    [SerializeField] private float jumpHeight = 3.3f;
     [Tooltip("额外水平速度（米/秒）")]
     [SerializeField] private float forwardSpeed = 2f;
 
