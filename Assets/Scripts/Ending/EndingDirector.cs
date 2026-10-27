@@ -11,21 +11,28 @@ public class EndingDirector : MonoBehaviour
     [SerializeField] private PlayerLook look;
 
     [Header("天空切换")]
+    [Tooltip("坠落进度到多少时切换成星空（0~1）")]
+    [Range(0.1f, 1f)]
+    [SerializeField] private float starSkyProgress = 0.85f;
     [SerializeField] private Material endingSkybox;
     [SerializeField] private Color endingFogColor = new Color(0.02f, 0.02f, 0.05f, 1f);
-    [SerializeField] private float endingFogEnd = 300f;
+    [SerializeField] private float endingFogEnd = 400f;
 
-    [Header("相机路径")]
-    [SerializeField] private float fallDistance = 24f;
-    [SerializeField] private float fallDuration = 4f;
-    [SerializeField] private float invertDegrees = 180f;
-    [SerializeField] private float pullBackDistance = 35f;
-    [SerializeField] private float riseDistance = 28f;
-    [SerializeField] private float pullBackDuration = 6f;
-    [SerializeField] private float fovEnd = 85f;
+    [Header("坠落")]
+    [Tooltip("坠落距离（米），越大塔越像一个点")]
+    [SerializeField] private float fallDistance = 160f;
+    [SerializeField] private float fallDuration = 9f;
+    [Tooltip("坠落时是否回头看出发点（看到塔缩小成一个点）")]
+    [SerializeField] private bool lookBackAtTower = true;
+    [Tooltip("坠落时的视场角收窄（视觉上更聚焦）")]
+    [SerializeField] private float fallFov = 45f;
+
+    [Header("收尾")]
+    [SerializeField] private float holdDuration = 3f;
+    [SerializeField] private float finalFov = 65f;
 
     [Header("调试")]
-    [Tooltip("调试快捷键（默认 F8 播放 / F7 还原，避免和系统截图键冲突）")]
+    [Tooltip("默认 F8 播放 / F7 还原")]
     [SerializeField] private bool enableDebugKeys = true;
     [SerializeField] private Key playKey = Key.F8;
     [SerializeField] private Key restoreKey = Key.F7;
@@ -152,9 +159,13 @@ public class EndingDirector : MonoBehaviour
         viewCamera.transform.SetParent(null, true);
 
         Vector3 startPosition = viewCamera.transform.position;
+        Vector3 lookTarget = startPosition + viewCamera.transform.forward * 6f;
         Quaternion startRotation = viewCamera.transform.rotation;
         float startFov = viewCamera.fieldOfView;
 
+        RenderSettings.fog = false;
+
+        bool skyboxSwitched = false;
         float elapsed = 0f;
 
         while (elapsed < fallDuration)
@@ -163,48 +174,64 @@ public class EndingDirector : MonoBehaviour
             float progress = Mathf.Clamp01(elapsed / fallDuration);
             float eased = progress * progress * (3f - 2f * progress);
 
-            viewCamera.transform.position = startPosition + Vector3.down * (fallDistance * eased);
-            viewCamera.transform.rotation = startRotation * Quaternion.Euler(invertDegrees * eased, 0f, 0f);
-            viewCamera.fieldOfView = Mathf.Lerp(startFov, fovEnd, eased);
+            Vector3 position = startPosition + Vector3.down * (fallDistance * eased);
+            viewCamera.transform.position = position;
+
+            if (lookBackAtTower)
+            {
+                Vector3 direction = (lookTarget - position).normalized;
+                Vector3 up = Mathf.Abs(Vector3.Dot(direction, Vector3.up)) > 0.98f ? Vector3.forward : Vector3.up;
+                Quaternion targetRotation = Quaternion.LookRotation(direction, up);
+                viewCamera.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, Mathf.Clamp01(eased * 2f));
+            }
+
+            viewCamera.fieldOfView = Mathf.Lerp(startFov, fallFov, eased);
+
+            if (!skyboxSwitched && progress >= starSkyProgress)
+            {
+                skyboxSwitched = true;
+                ApplyStarSky();
+                Debug.Log("[Ending] 塔已缩成一个点，切换星空");
+            }
 
             yield return null;
         }
 
+        if (!skyboxSwitched)
+        {
+            ApplyStarSky();
+        }
+
+        float holdStart = Time.time;
+        Vector3 holdStartPosition = viewCamera.transform.position;
+        Vector3 holdEndPosition = holdStartPosition + Vector3.up * 12f;
+        float holdStartFov = viewCamera.fieldOfView;
+
+        while (Time.time - holdStart < holdDuration)
+        {
+            float progress = Mathf.Clamp01((Time.time - holdStart) / holdDuration);
+            float eased = progress * progress * (3f - 2f * progress);
+
+            viewCamera.transform.position = Vector3.Lerp(holdStartPosition, holdEndPosition, eased);
+            viewCamera.fieldOfView = Mathf.Lerp(holdStartFov, finalFov, eased);
+
+            yield return null;
+        }
+
+        _routine = null;
+        Debug.Log("[Ending] 占位结局播放完成。按 F7 还原。");
+    }
+
+    private void ApplyStarSky()
+    {
         if (endingSkybox != null)
         {
             RenderSettings.skybox = endingSkybox;
         }
 
         RenderSettings.fog = true;
-        RenderSettings.fogEndDistance = endingFogEnd;
         RenderSettings.fogColor = endingFogColor;
+        RenderSettings.fogEndDistance = endingFogEnd;
         DynamicGI.UpdateEnvironment();
-
-        Vector3 pullStart = viewCamera.transform.position;
-        Vector3 away = pullStart;
-        away.y = 0f;
-        away = away.sqrMagnitude > 0.01f ? away.normalized : Vector3.back;
-        Vector3 pullEnd = pullStart + Vector3.up * riseDistance + away * pullBackDistance;
-        Quaternion pullStartRotation = viewCamera.transform.rotation;
-        Quaternion pullEndRotation = Quaternion.Euler(-55f, viewCamera.transform.eulerAngles.y, 0f);
-        float pullStartFov = viewCamera.fieldOfView;
-
-        elapsed = 0f;
-
-        while (elapsed < pullBackDuration)
-        {
-            elapsed += Time.deltaTime;
-            float progress = Mathf.Clamp01(elapsed / pullBackDuration);
-            float eased = progress * progress * (3f - 2f * progress);
-
-            viewCamera.transform.position = Vector3.Lerp(pullStart, pullEnd, eased);
-            viewCamera.transform.rotation = Quaternion.Slerp(pullStartRotation, pullEndRotation, eased);
-            viewCamera.fieldOfView = Mathf.Lerp(pullStartFov, 60f, eased);
-
-            yield return null;
-        }
-
-        _routine = null;
-        Debug.Log("[Ending] 相机路径播放完成（占位版）。按 F9 还原。");
     }
 }
