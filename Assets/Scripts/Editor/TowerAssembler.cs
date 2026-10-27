@@ -14,6 +14,8 @@ public class TowerAssemblerWindow : EditorWindow
     [SerializeField] private float heightStep = 1f;
     [SerializeField] private float angleStep = 15f;
     [SerializeField] private float startTop = 1f;
+    [SerializeField] private int repeats = 1;
+    [SerializeField] private int fillerGrowthPerRepeat = 1;
     [SerializeField] private bool shuffle;
     [SerializeField] private int seed = 2026;
     [SerializeField] private bool autoValidate = true;
@@ -106,6 +108,8 @@ public class TowerAssemblerWindow : EditorWindow
         heightStep = EditorGUILayout.FloatField("每步高度", heightStep);
         angleStep = EditorGUILayout.FloatField("每步角度", angleStep);
         startTop = EditorGUILayout.FloatField("起始顶面高度", startTop);
+        repeats = EditorGUILayout.IntSlider("重复轮数", repeats, 1, 8);
+        fillerGrowthPerRepeat = EditorGUILayout.IntSlider("每轮填充增加", fillerGrowthPerRepeat, 0, 5);
 
         GUILayout.Space(6f);
         shuffle = EditorGUILayout.Toggle("打乱顺序", shuffle);
@@ -191,31 +195,39 @@ public class TowerAssemblerWindow : EditorWindow
 
         anchorPosition = CreateBlock(root.transform, anchorPosition, anchorTop);
 
-        for (int s = 0; s < ordered.Count; s++)
+        int total = ordered.Count * repeats;
+        int index = 0;
+
+        for (int round = 0; round < repeats; round++)
         {
-            int filler = Random.Range(fillerMin, fillerMax + 1);
-
-            for (int i = 0; i < filler; i++)
+            for (int s = 0; s < ordered.Count; s++)
             {
+                index++;
+                int growth = round * fillerGrowthPerRepeat;
+                int filler = Random.Range(fillerMin + growth, fillerMax + growth + 1);
+
+                for (int i = 0; i < filler; i++)
+                {
+                    direction = Quaternion.Euler(0f, angleStep, 0f) * direction;
+                    anchorPosition += direction * stepDistance;
+                    anchorTop += heightStep;
+                    CreateBlock(root.transform, anchorPosition, anchorTop);
+                }
+
                 direction = Quaternion.Euler(0f, angleStep, 0f) * direction;
-                anchorPosition += direction * stepDistance;
-                anchorTop += heightStep;
-                CreateBlock(root.transform, anchorPosition, anchorTop);
-            }
+                Vector3 entryTarget = anchorPosition + direction * stepDistance;
+                entryTarget.y = anchorTop + heightStep;
 
-            direction = Quaternion.Euler(0f, angleStep, 0f) * direction;
-            Vector3 entryTarget = anchorPosition + direction * stepDistance;
-            entryTarget.y = anchorTop + heightStep;
-
-            if (PlaceSection(root.transform, ordered[s], entryTarget, direction, out Vector3 exitPosition, out float exitTop))
-            {
-                anchorPosition = exitPosition;
-                anchorTop = exitTop;
-                Debug.Log($"[Assembler] {s + 1}/{ordered.Count} {ordered[s].name} → Exit 高度 {exitTop:F1}");
-            }
-            else
-            {
-                Debug.LogError($"[Assembler] {ordered[s].name} 放置失败。");
+                if (PlaceSection(root.transform, ordered[s], entryTarget, direction, out Vector3 exitPosition, out float exitTop))
+                {
+                    anchorPosition = exitPosition;
+                    anchorTop = exitTop;
+                    Debug.Log($"[Assembler] {index}/{total} {ordered[s].name} → Exit 高度 {exitTop:F1}");
+                }
+                else
+                {
+                    Debug.LogError($"[Assembler] {ordered[s].name} 放置失败。");
+                }
             }
         }
 
@@ -226,7 +238,7 @@ public class TowerAssemblerWindow : EditorWindow
             LevelValidation.ValidateHierarchy(root);
         }
 
-        Debug.Log($"[Assembler] 完成：{ordered.Count} 个段，顶面高度约 {anchorTop:F1}m");
+        Debug.Log($"[Assembler] 完成：{total} 个段，顶面高度约 {anchorTop:F1}m");
     }
 
     private Vector3 CreateBlock(Transform parent, Vector3 position, float top)
