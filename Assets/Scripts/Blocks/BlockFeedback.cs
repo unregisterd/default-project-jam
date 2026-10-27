@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -7,10 +7,10 @@ public class BlockFeedback : MonoBehaviour
     private static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
 
     [Tooltip("压扁幅度（0.12 = 12%）")]
-    [SerializeField] private float squashAmount = 0.12f;
-    [SerializeField] private float squashDuration = 0.18f;
+    [SerializeField] private float squashAmount = 0.2f;
+    [SerializeField] private float squashDuration = 0.25f;
     [Tooltip("自发光闪一下的强度")]
-    [SerializeField] private float flashIntensity = 1.4f;
+    [SerializeField] private float flashIntensity = 2f;
     [SerializeField] private float flashDuration = 0.25f;
 
     private Block _block;
@@ -27,6 +27,20 @@ public class BlockFeedback : MonoBehaviour
         _propertyBlock = new MaterialPropertyBlock();
 
         Transform model = transform.Find("Model");
+
+        if (model == null)
+        {
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                Transform child = transform.GetChild(i);
+
+                if (child.GetComponent<Collider>() == null && child.GetComponentInChildren<Renderer>(true) != null)
+                {
+                    model = child;
+                    break;
+                }
+            }
+        }
 
         if (model != null)
         {

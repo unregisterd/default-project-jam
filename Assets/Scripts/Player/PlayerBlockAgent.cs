@@ -12,9 +12,16 @@ public class PlayerBlockAgent : MonoBehaviour
     [Tooltip("掉到这个高度以下就回到上一个安全位置")]
     [SerializeField] private float fallRespawnY = -12f;
 
+    [Header("落地音效")]
+    [Tooltip("留空则从 Resources/Audio/step_land 自动加载")]
+    [SerializeField] private AudioClip landingClip;
+    [Range(0f, 1f)]
+    [SerializeField] private float landingVolume = 0.7f;
+
     private CharacterController _controller;
     private Block _standingBlock;
     private Vector3 _lastSafePosition;
+    private AudioSource _audio;
     private bool _wasGrounded = true;
 
     public Block StandingBlock => _standingBlock;
@@ -31,6 +38,20 @@ public class PlayerBlockAgent : MonoBehaviour
         }
 
         _lastSafePosition = transform.position;
+
+        _audio = GetComponent<AudioSource>();
+
+        if (_audio == null)
+        {
+            _audio = gameObject.AddComponent<AudioSource>();
+            _audio.playOnAwake = false;
+            _audio.spatialBlend = 0f;
+        }
+
+        if (landingClip == null)
+        {
+            landingClip = Resources.Load<AudioClip>("Audio/step_land");
+        }
     }
 
     private void Update()
@@ -113,19 +134,32 @@ public class PlayerBlockAgent : MonoBehaviour
     {
         Block block = ProbeBlock();
 
-        if (block == null)
+        if (block != null)
+        {
+            block.TryAdvance();
+
+            BlockFeedback feedback = block.GetComponent<BlockFeedback>();
+
+            if (feedback == null)
+            {
+                feedback = block.gameObject.AddComponent<BlockFeedback>();
+            }
+
+            feedback.Play();
+        }
+
+        PlayLandingSound();
+    }
+
+    private void PlayLandingSound()
+    {
+        if (_audio == null || landingClip == null)
         {
             return;
         }
 
-        BlockFeedback feedback = block.GetComponent<BlockFeedback>();
-
-        if (feedback == null)
-        {
-            feedback = block.gameObject.AddComponent<BlockFeedback>();
-        }
-
-        feedback.Play();
+        _audio.pitch = 0.95f + UnityEngine.Random.Range(0f, 0.1f);
+        _audio.PlayOneShot(landingClip, landingVolume);
     }
 
     public void NotifyExternalMove()
