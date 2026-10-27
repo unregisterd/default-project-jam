@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -25,8 +25,10 @@ public class EndingDirector : MonoBehaviour
     [SerializeField] private float fovEnd = 85f;
 
     [Header("调试")]
-    [Tooltip("F10 播放，F9 还原")]
+    [Tooltip("调试快捷键（默认 F8 播放 / F7 还原，避免和系统截图键冲突）")]
     [SerializeField] private bool enableDebugKeys = true;
+    [SerializeField] private Key playKey = Key.F8;
+    [SerializeField] private Key restoreKey = Key.F7;
 
     private Transform _cameraOriginalParent;
     private Vector3 _cameraOriginalLocalPosition;
@@ -68,12 +70,12 @@ public class EndingDirector : MonoBehaviour
             return;
         }
 
-        if (Keyboard.current.f10Key.wasPressedThisFrame)
+        if (Keyboard.current[playKey].wasPressedThisFrame)
         {
             Play();
         }
 
-        if (Keyboard.current.f9Key.wasPressedThisFrame)
+        if (Keyboard.current[restoreKey].wasPressedThisFrame)
         {
             Restore();
         }

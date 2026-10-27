@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 public static class EndingSetup
@@ -41,7 +41,7 @@ public static class EndingSetup
         serialized.ApplyModifiedPropertiesWithoutUndo();
         Selection.activeGameObject = go;
 
-        Debug.Log("[Ending] 已创建 EndingDirector：F10 播放占位结局运镜，F9 还原"
+        Debug.Log("[Ending] 已创建 EndingDirector：F8 播放占位结局运镜，F7 还原（可在组件上改键）"
                   + (nightSky != null ? "，天空盒使用 CoriolisNight4k" : "，但没找到夜景天空盒"));
     }
 
