@@ -11,6 +11,8 @@ public class TowerToolsWindow : EditorWindow
     private float heightStep = 1f;
     private float startHeight = 1f;
     private int seed = 12345;
+    private bool continueFromSelection;
+    private float stepDistance = 1.5f;
 
     [MenuItem("Tools/Level/Tower Tools")]
     public static void Open()
@@ -39,6 +41,16 @@ public class TowerToolsWindow : EditorWindow
         }
 
         GUILayout.Space(12f);
+        GUILayout.Label("从选中方块继续", EditorStyles.boldLabel);
+        continueFromSelection = EditorGUILayout.Toggle("启用", continueFromSelection);
+        stepDistance = EditorGUILayout.FloatField("每步前进", stepDistance);
+
+        if (GUILayout.Button("从选中方块生成路径段"))
+        {
+            GenerateFromSelection();
+        }
+
+        GUILayout.Space(12f);
         GUILayout.Label("校验", EditorStyles.boldLabel);
 
         if (GUILayout.Button("校验场景里的方块"))
@@ -47,6 +59,40 @@ public class TowerToolsWindow : EditorWindow
         }
     }
 
+    private void GenerateFromSelection()
+    {
+        GameObject anchor = Selection.activeGameObject;
+
+        if (anchor == null || blockPrefab == null)
+        {
+            EditorUtility.DisplayDialog("Tower Tools", "先选中一个起点方块，并指定方块预制体。", "好");
+            return;
+        }
+
+        Block anchorBlock = anchor.GetComponentInParent<Block>();
+        float baseTop = anchorBlock != null ? anchorBlock.GetTopHeight() : anchor.transform.position.y;
+        Vector3 position = anchor.transform.position;
+        position.y = baseTop;
+        Vector3 direction = anchor.transform.forward;
+
+        GameObject root = new GameObject("PathSegment");
+        Undo.RegisterCreatedObjectUndo(root, "Generate Path");
+
+        for (int i = 0; i < steps; i++)
+        {
+            position += direction * stepDistance;
+            position.y = baseTop + heightStep * (i + 1);
+            direction = Quaternion.Euler(0f, angleStep, 0f) * direction;
+
+            GameObject instance = (GameObject)PrefabUtility.InstantiatePrefab(blockPrefab, root.transform);
+            instance.name = $"Path_{i:000}";
+            instance.transform.position = position - Vector3.up * 0.5f;
+            instance.transform.rotation = Quaternion.LookRotation(direction, Vector3.up);
+        }
+
+        Selection.activeGameObject = root;
+        Debug.Log($"[Tower] 从 {anchor.name} 生成 {steps} 步，顶面高度 {baseTop + heightStep * steps:F1}m");
+    }
     private void GenerateSpiral()
     {
         if (blockPrefab == null)
