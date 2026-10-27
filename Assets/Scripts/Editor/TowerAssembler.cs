@@ -6,16 +6,19 @@ public class TowerAssemblerWindow : EditorWindow
 {
     private const string LevelFolder = "Assets/Prefabs/Level";
 
-    private GameObject blockPrefab;
-    private int fillerMin = 6;
-    private int fillerMax = 10;
-    private float stepDistance = 1.5f;
-    private float heightStep = 1f;
-    private float angleStep = 15f;
-    private float startTop = 1f;
-    private bool shuffle = true;
-    private int seed = 2026;
-    private bool autoValidate = true;
+    [SerializeField] private List<GameObject> sections = new List<GameObject>();
+    [SerializeField] private GameObject blockPrefab;
+    [SerializeField] private int fillerMin = 6;
+    [SerializeField] private int fillerMax = 10;
+    [SerializeField] private float stepDistance = 1.5f;
+    [SerializeField] private float heightStep = 1f;
+    [SerializeField] private float angleStep = 15f;
+    [SerializeField] private float startTop = 1f;
+    [SerializeField] private bool shuffle;
+    [SerializeField] private int seed = 2026;
+    [SerializeField] private bool autoValidate = true;
+
+    private Vector2 _scroll;
 
     [MenuItem("Tools/Level/Tower Assembler")]
     public static void Open()
@@ -23,61 +26,159 @@ public class TowerAssemblerWindow : EditorWindow
         GetWindow<TowerAssemblerWindow>("Tower Assembler");
     }
 
+    private void OnEnable()
+    {
+        if (sections.Count == 0)
+        {
+            ScanSections();
+        }
+    }
+
     private void OnGUI()
     {
-        GUILayout.Label("整塔装配：段预制体 + 填充路", EditorStyles.boldLabel);
+        GUILayout.Label("整塔装配", EditorStyles.boldLabel);
 
         blockPrefab = (GameObject)EditorGUILayout.ObjectField("填充方块预制体", blockPrefab, typeof(GameObject), false);
-        fillerMin = EditorGUILayout.IntSlider("填充步数最小值", fillerMin, 1, 30);
-        fillerMax = EditorGUILayout.IntSlider("填充步数最大值", fillerMax, 1, 30);
+
+        GUILayout.Space(6f);
+        GUILayout.Label("段落顺序（从上到下）", EditorStyles.boldLabel);
+
+        _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(160f));
+
+        for (int i = 0; i < sections.Count; i++)
+        {
+            GUILayout.BeginHorizontal();
+
+            sections[i] = (GameObject)EditorGUILayout.ObjectField($"{i + 1}", sections[i], typeof(GameObject), false);
+
+            GUI.enabled = i > 0;
+
+            if (GUILayout.Button("↑", GUILayout.Width(24f)))
+            {
+                (sections[i - 1], sections[i]) = (sections[i], sections[i - 1]);
+            }
+
+            GUI.enabled = i < sections.Count - 1;
+
+            if (GUILayout.Button("↓", GUILayout.Width(24f)))
+            {
+                (sections[i + 1], sections[i]) = (sections[i], sections[i + 1]);
+            }
+
+            GUI.enabled = true;
+
+            if (GUILayout.Button("✕", GUILayout.Width(24f)))
+            {
+                sections.RemoveAt(i);
+                break;
+            }
+
+            GUILayout.EndHorizontal();
+        }
+
+        GUILayout.EndScrollView();
+
+        GUILayout.BeginHorizontal();
+
+        if (GUILayout.Button("扫描 Level 文件夹"))
+        {
+            ScanSections();
+        }
+
+        if (GUILayout.Button("添加空位"))
+        {
+            sections.Add(null);
+        }
+
+        if (GUILayout.Button("清空"))
+        {
+            sections.Clear();
+        }
+
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(8f);
+        GUILayout.Label("填充 / 路径", EditorStyles.boldLabel);
+
+        fillerMin = EditorGUILayout.IntSlider("填充步数最小", fillerMin, 1, 30);
+        fillerMax = EditorGUILayout.IntSlider("填充步数最大", fillerMax, 1, 30);
         stepDistance = EditorGUILayout.FloatField("每步前进", stepDistance);
         heightStep = EditorGUILayout.FloatField("每步高度", heightStep);
         angleStep = EditorGUILayout.FloatField("每步角度", angleStep);
         startTop = EditorGUILayout.FloatField("起始顶面高度", startTop);
-        shuffle = EditorGUILayout.Toggle("随机顺序", shuffle);
+
+        GUILayout.Space(6f);
+        shuffle = EditorGUILayout.Toggle("打乱顺序", shuffle);
         seed = EditorGUILayout.IntField("随机种子", seed);
         autoValidate = EditorGUILayout.Toggle("生成后校验", autoValidate);
 
         GUILayout.Space(8f);
 
-        if (GUILayout.Button("生成整塔"))
+        if (GUILayout.Button("生成整塔", GUILayout.Height(30f)))
         {
             Build();
         }
+    }
 
-        if (GUILayout.Button("列出可用段"))
+    private void ScanSections()
+    {
+        sections.Clear();
+        string[] guids = AssetDatabase.FindAssets("t:Prefab", new[] { LevelFolder });
+        List<GameObject> found = new List<GameObject>();
+
+        foreach (string guid in guids)
         {
-            foreach (GameObject section in LoadSections())
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+
+            if (!path.StartsWith(LevelFolder))
             {
-                Debug.Log($"[Assembler] {section.name}");
+                continue;
+            }
+
+            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+
+            if (prefab != null && prefab.GetComponent<TowerSection>() != null)
+            {
+                found.Add(prefab);
             }
         }
+
+        found.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
+        sections.AddRange(found);
     }
 
     private void Build()
     {
         if (blockPrefab == null)
         {
-            EditorUtility.DisplayDialog("Assembler", "先指定填充方块预制体（Block_Art_Red/Blue）。", "好");
+            EditorUtility.DisplayDialog("Assembler", "先指定填充方块预制体。", "好");
             return;
         }
 
-        List<GameObject> sections = LoadSections();
+        List<GameObject> ordered = new List<GameObject>();
 
-        if (sections.Count == 0)
+        foreach (GameObject section in sections)
         {
-            EditorUtility.DisplayDialog("Assembler", $"在 {LevelFolder} 里没找到带 TowerSection 的预制体。", "好");
+            if (section != null)
+            {
+                ordered.Add(section);
+            }
+        }
+
+        if (ordered.Count == 0)
+        {
+            EditorUtility.DisplayDialog("Assembler", "段落列表是空的。", "好");
             return;
         }
+
+        Random.InitState(seed);
 
         if (shuffle)
         {
-            Random.InitState(seed);
-
-            for (int i = sections.Count - 1; i > 0; i--)
+            for (int i = ordered.Count - 1; i > 0; i--)
             {
                 int j = Random.Range(0, i + 1);
-                (sections[i], sections[j]) = (sections[j], sections[i]);
+                (ordered[i], ordered[j]) = (ordered[j], ordered[i]);
             }
         }
 
@@ -90,9 +191,7 @@ public class TowerAssemblerWindow : EditorWindow
 
         anchorPosition = CreateBlock(root.transform, anchorPosition, anchorTop);
 
-        Random.InitState(seed + 1);
-
-        for (int s = 0; s < sections.Count; s++)
+        for (int s = 0; s < ordered.Count; s++)
         {
             int filler = Random.Range(fillerMin, fillerMax + 1);
 
@@ -108,15 +207,15 @@ public class TowerAssemblerWindow : EditorWindow
             Vector3 entryTarget = anchorPosition + direction * stepDistance;
             entryTarget.y = anchorTop + heightStep;
 
-            if (PlaceSection(root.transform, sections[s], entryTarget, direction, out Vector3 exitPosition, out float exitTop))
+            if (PlaceSection(root.transform, ordered[s], entryTarget, direction, out Vector3 exitPosition, out float exitTop))
             {
                 anchorPosition = exitPosition;
                 anchorTop = exitTop;
-                Debug.Log($"[Assembler] {sections[s].name} → Exit 高度 {exitTop:F1}");
+                Debug.Log($"[Assembler] {s + 1}/{ordered.Count} {ordered[s].name} → Exit 高度 {exitTop:F1}");
             }
             else
             {
-                Debug.LogError($"[Assembler] {sections[s].name} 放置失败，后续段可能错位。");
+                Debug.LogError($"[Assembler] {ordered[s].name} 放置失败。");
             }
         }
 
@@ -127,7 +226,7 @@ public class TowerAssemblerWindow : EditorWindow
             LevelValidation.ValidateHierarchy(root);
         }
 
-        Debug.Log($"[Assembler] 完成：{sections.Count} 个段，顶面高度约 {anchorTop:F1}m");
+        Debug.Log($"[Assembler] 完成：{ordered.Count} 个段，顶面高度约 {anchorTop:F1}m");
     }
 
     private Vector3 CreateBlock(Transform parent, Vector3 position, float top)
@@ -158,33 +257,6 @@ public class TowerAssemblerWindow : EditorWindow
 
         exitPosition = section.Exit.position;
         exitTop = exitPosition.y;
-
         return true;
-    }
-
-    private List<GameObject> LoadSections()
-    {
-        List<GameObject> result = new List<GameObject>();
-        string[] guids = AssetDatabase.FindAssets("t:Prefab", new[] { LevelFolder });
-
-        foreach (string guid in guids)
-        {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-
-            if (!path.StartsWith(LevelFolder))
-            {
-                continue;
-            }
-
-            GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
-
-            if (prefab != null && prefab.GetComponent<TowerSection>() != null)
-            {
-                result.Add(prefab);
-            }
-        }
-
-        result.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
-        return result;
     }
 }
