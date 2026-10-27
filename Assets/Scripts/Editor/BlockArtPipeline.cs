@@ -92,6 +92,31 @@ public static class BlockArtPipeline
         PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
         Object.DestroyImmediate(root);
     }
+    [MenuItem("Tools/Art/Enable Emission (Block Materials)")]
+    public static void EnableEmissionOnMaterials()
+    {
+        string[] guids = AssetDatabase.FindAssets("t:Material", new[] { MaterialFolder });
+        int count = 0;
+
+        foreach (string guid in guids)
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+
+            if (material == null || !material.HasProperty("_EmissionColor"))
+            {
+                continue;
+            }
+
+            material.EnableKeyword("_EMISSION");
+            material.SetColor("_EmissionColor", Color.black);
+            EditorUtility.SetDirty(material);
+            count++;
+        }
+
+        AssetDatabase.SaveAssets();
+        Debug.Log($"[ArtPipe] 已为 {count} 个材质开启自发光（颜色为黑，不影响外观）");
+    }
     [MenuItem("Tools/Art/Palette -> Art Materials")]
     public static void SwitchPaletteToArt()
     {
@@ -179,6 +204,8 @@ public static class BlockArtPipeline
 
         material.SetFloat("_Metallic", Mathf.Clamp01(metallicValue));
         material.SetFloat("_Smoothness", Mathf.Clamp01(1f - roughnessValue));
+        material.EnableKeyword("_EMISSION");
+        material.SetColor("_EmissionColor", Color.black);
         material.enableInstancing = true;
         EditorUtility.SetDirty(material);
 

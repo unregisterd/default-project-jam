@@ -15,6 +15,7 @@ public class PlayerBlockAgent : MonoBehaviour
     private CharacterController _controller;
     private Block _standingBlock;
     private Vector3 _lastSafePosition;
+    private bool _wasGrounded = true;
 
     public Block StandingBlock => _standingBlock;
 
@@ -42,7 +43,14 @@ public class PlayerBlockAgent : MonoBehaviour
 
         if (!_controller.isGrounded)
         {
+            _wasGrounded = false;
             return;
+        }
+
+        if (!_wasGrounded)
+        {
+            _wasGrounded = true;
+            PlayLandingFeedback();
         }
 
         Block under = ProbeBlock();
@@ -98,6 +106,26 @@ public class PlayerBlockAgent : MonoBehaviour
 
         _standingBlock = null;
         _lastSafePosition = position;
+    }
+
+
+    private void PlayLandingFeedback()
+    {
+        Block block = ProbeBlock();
+
+        if (block == null)
+        {
+            return;
+        }
+
+        BlockFeedback feedback = block.GetComponent<BlockFeedback>();
+
+        if (feedback == null)
+        {
+            feedback = block.gameObject.AddComponent<BlockFeedback>();
+        }
+
+        feedback.Play();
     }
 
     public void NotifyExternalMove()
