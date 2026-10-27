@@ -6,7 +6,8 @@ public static class BlockArtPipeline
 {
     private const string BlocksRoot = "Assets/Art/Blocks";
     private const string MaterialFolder = "Assets/Art/Materials";
-    private const string PrefabPath = "Assets/Prefabs/Blocks/Block_Art.prefab";
+    private const string PrefabFolder = "Assets/Prefabs/Blocks";
+
     private const string PalettePath = "Assets/Settings/BlockPalette.asset";
 
     [MenuItem("Tools/Art/Build Art Materials")]
@@ -23,10 +24,18 @@ public static class BlockArtPipeline
         Debug.Log("[ArtPipe] 材质生成完成：M_Block_Red_Art / M_Block_Blue_Art");
     }
 
-    [MenuItem("Tools/Art/Build Block Art Prefab")]
-    public static void BuildArtPrefab()
+    [MenuItem("Tools/Art/Build Block Art Prefabs")]
+    public static void BuildArtPrefabs()
     {
-        string modelPath = $"{BlocksRoot}/Blue/SM_Block_Blue.fbx";
+        BuildArtPrefab("Blue");
+        BuildArtPrefab("Red");
+        AssetDatabase.SaveAssets();
+        Debug.Log($"[ArtPipe] 已生成 {PrefabFolder}/Block_Art_Blue.prefab 与 Block_Art_Red.prefab");
+    }
+
+    private static void BuildArtPrefab(string color)
+    {
+        string modelPath = $"{BlocksRoot}/{color}/SM_Block_{color}.fbx";
         GameObject modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
 
         if (modelAsset == null)
@@ -35,16 +44,7 @@ public static class BlockArtPipeline
             return;
         }
 
-        if (!EditorUtility.DisplayDialog(
-                "美术方块预制体",
-                $"用 {modelPath} 生成 {PrefabPath}？\n已存在的同名预制体会被覆盖。",
-                "生成",
-                "取消"))
-        {
-            return;
-        }
-
-        GameObject root = new GameObject("Block_Art");
+        GameObject root = new GameObject($"Block_Art_{color}");
 
         GameObject model = (GameObject)PrefabUtility.InstantiatePrefab(modelAsset);
         model.name = "Model";
@@ -52,12 +52,11 @@ public static class BlockArtPipeline
 
         Bounds bounds = CalculateBounds(model);
         Vector3 size = bounds.size;
-        Vector3 targetSize = Vector3.one;
 
         model.transform.localScale = new Vector3(
-            targetSize.x / Mathf.Max(size.x, 0.0001f),
-            targetSize.y / Mathf.Max(size.y, 0.0001f),
-            targetSize.z / Mathf.Max(size.z, 0.0001f));
+            1f / Mathf.Max(size.x, 0.0001f),
+            1f / Mathf.Max(size.y, 0.0001f),
+            1f / Mathf.Max(size.z, 0.0001f));
 
         model.transform.localPosition = -bounds.center;
 
@@ -77,25 +76,22 @@ public static class BlockArtPipeline
             block.SetPalette(palette);
         }
 
+        Material artMaterial = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialFolder}/M_Block_{color}_Art.mat");
         Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
-        Material blueMaterial = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialFolder}/M_Block_Blue_Art.mat");
 
-        if (blueMaterial != null)
+        if (artMaterial != null)
         {
             foreach (Renderer renderer in renderers)
             {
-                renderer.sharedMaterial = blueMaterial;
+                renderer.sharedMaterial = artMaterial;
             }
         }
 
-        EnsureFolder("Assets/Prefabs/Blocks");
-        PrefabUtility.SaveAsPrefabAsset(root, PrefabPath);
+        EnsureFolder(PrefabFolder);
+        string prefabPath = $"{PrefabFolder}/Block_Art_{color}.prefab";
+        PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
         Object.DestroyImmediate(root);
-        AssetDatabase.SaveAssets();
-
-        Debug.Log($"[ArtPipe] 已生成 {PrefabPath}（模型尺寸归一化到 1×1×1，碰撞体 1m）");
     }
-
     [MenuItem("Tools/Art/Palette -> Art Materials")]
     public static void SwitchPaletteToArt()
     {
