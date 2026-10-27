@@ -21,9 +21,29 @@ public class WisdomAbility : MonoBehaviour, IAbility
 
     public bool CanUse(out string reason)
     {
-        if (_blocks == null || _blocks.Length == 0)
+        if (HasCandidate())
         {
-            RefreshBlocks();
+            reason = null;
+            return true;
+        }
+
+        RefreshBlocks();
+
+        if (HasCandidate())
+        {
+            reason = null;
+            return true;
+        }
+
+        reason = "附近没有隐藏道路";
+        return false;
+    }
+
+    private bool HasCandidate()
+    {
+        if (_blocks == null)
+        {
+            return false;
         }
 
         for (int i = 0; i < _blocks.Length; i++)
@@ -37,12 +57,10 @@ public class WisdomAbility : MonoBehaviour, IAbility
 
             if (IsInRange(block))
             {
-                reason = null;
                 return true;
             }
         }
 
-        reason = "附近没有隐藏道路";
         return false;
     }
 

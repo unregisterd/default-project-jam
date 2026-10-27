@@ -55,6 +55,6 @@ public class Hud_StarEnergy : MonoBehaviour
         }
 
         GUI.color = previous;
-        GUI.Label(new Rect(x + 6f, y - 2f, 320f, 24f), "1 Courage  2 Patience  3 Hope  4 Wisdom", _style);
+        GUI.Label(new Rect(x + 6f, y - 2f, 320f, 24f), "1 Courage  2 Wisdom  3 Patience  4 Hope", _style);
     }
 }

@@ -1,7 +1,7 @@
 ﻿public enum AbilityType
 {
     Courage = 0,
-    Patience = 1,
-    Hope = 2,
-    Wisdom = 3,
+    Wisdom = 1,
+    Patience = 2,
+    Hope = 3,
 }

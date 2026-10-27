@@ -85,7 +85,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 81108883c66c1bd4c9529436f8df2c9b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -133,8 +133,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f141918fe587c141aa9096bf13cdac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: {fileID: 0}
-  palette: {fileID: 0}
+  type: {fileID: 11400000, guid: d22b8e70ec024ce438019bbefeda4505, type: 2}
+  palette: {fileID: 11400000, guid: dcabdb554f96dda41ac71e8739cd02de, type: 2}
   view: {fileID: 1053921835516729375}
   canRaise: 1
   startColorIndex: 0

@@ -68,7 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f141918fe587c141aa9096bf13cdac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: {fileID: 0}
+  type: {fileID: 11400000, guid: d22b8e70ec024ce438019bbefeda4505, type: 2}
   palette: {fileID: 11400000, guid: dcabdb554f96dda41ac71e8739cd02de, type: 2}
   view: {fileID: 4117319228574229850}
   canRaise: 1
@@ -164,7 +164,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: c787ffdeafdde4040b8553d7e5bb66a8, type: 2}
+      objectReference: {fileID: 2100000, guid: 81108883c66c1bd4c9529436f8df2c9b, type: 2}
     - target: {fileID: 919132149155446097, guid: 7cb73cf163c22da4fa538d4adf298cba,
         type: 3}
       propertyPath: m_Name

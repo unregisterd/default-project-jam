@@ -93,17 +93,17 @@ public class AbilityController : MonoBehaviour
 
         if (input.Ability2Pressed)
         {
-            TryUse(_patience);
+            TryUse(_wisdom);
         }
 
         if (input.Ability3Pressed)
         {
-            TryUse(_hope);
+            TryUse(_patience);
         }
 
         if (input.Ability4Pressed)
         {
-            TryUse(_wisdom);
+            TryUse(_hope);
         }
     }
 
