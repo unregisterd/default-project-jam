@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -93,12 +93,55 @@ public static class LevelValidation
     [MenuItem("Tools/Level/Validate Blocks")]
     public static void ValidateSceneBlocks()
     {
-        Block[] blocks = Object.FindObjectsOfType<Block>();
+        Validate(CollectBlocks(null));
+    }
 
-        if (blocks.Length == 0)
+    [MenuItem("Tools/Level/Validate Selected Hierarchy")]
+    public static void ValidateSelectedHierarchy()
+    {
+        GameObject root = Selection.activeGameObject;
+
+        if (root == null)
         {
-            Debug.LogWarning("[Validate] 场景里没有 Block。");
+            Debug.LogWarning("[Validate] 先选中要校验的根节点。");
             return;
+        }
+
+        Validate(CollectBlocks(root.transform));
+    }
+
+    private static List<Block> CollectBlocks(Transform root)
+    {
+        List<Block> result = new List<Block>();
+
+        if (root != null)
+        {
+            result.AddRange(root.GetComponentsInChildren<Block>(true));
+            return result;
+        }
+
+        result.AddRange(Object.FindObjectsOfType<Block>());
+        return result;
+    }
+
+    private static void Validate(List<Block> blocks)
+    {
+        if (blocks.Count == 0)
+        {
+            Debug.LogWarning("[Validate] 没有 Block。");
+            return;
+        }
+
+        float lowestTop = float.MaxValue;
+
+        for (int i = 0; i < blocks.Count; i++)
+        {
+            float top = blocks[i].GetTopHeight();
+
+            if (top < lowestTop)
+            {
+                lowestTop = top;
+            }
         }
 
         List<Block> sorted = new List<Block>(blocks);
@@ -111,6 +154,11 @@ public static class LevelValidation
         {
             Block block = sorted[i];
             float top = block.GetTopHeight();
+
+            if (top <= lowestTop + 0.01f)
+            {
+                continue;
+            }
 
             bool hasNormal = false;
             bool hasAny = false;
@@ -155,7 +203,7 @@ public static class LevelValidation
             }
         }
 
-        Debug.Log($"[Validate] 方块 {blocks.Length} 个；纯跳跃不可达 {noNormalPath.Count} 个；任何方式都不可达 {noAnyPath.Count} 个");
+        Debug.Log($"[Validate] 方块 {blocks.Count} 个；纯跳跃不可达 {noNormalPath.Count} 个；任何方式都不可达 {noAnyPath.Count} 个");
 
         if (noNormalPath.Count > 0)
         {
