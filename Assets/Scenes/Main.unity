@@ -2285,17 +2285,16 @@ MonoBehaviour:
   playerRoot: {fileID: 238314291}
   motor: {fileID: 238314288}
   look: {fileID: 238314287}
-  endingSkybox: {fileID: 2100000, guid: 369b9ebe3a62b904dbc19bd332b44086, type: 2}
+  starSkyProgress: 0.85
+  endingSkybox: {fileID: 2100000, guid: 72deae4d18418f94688abef8e8483df0, type: 2}
   endingFogColor: {r: 0.02, g: 0.02, b: 0.05, a: 1}
   endingFogEnd: 300
-  backgroundFadeDuration: 1
   fallDistance: 24
   fallDuration: 6
-  invertDegrees: 180
-  pullBackDistance: 35
-  riseDistance: 28
-  pullBackDuration: 6
-  fovEnd: 85
+  lookBackAtTower: 1
+  fallFov: 45
+  holdDuration: 3
+  finalFov: 65
   enableDebugKeys: 1
   playKey: 19
   restoreKey: 32

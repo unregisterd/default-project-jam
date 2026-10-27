@@ -17,9 +17,9 @@ public class Hud_StarEnergy : MonoBehaviour
     [SerializeField] private AbilityWallet wallet;
 
     [Header("位置")]
-    [SerializeField] private HudAnchor anchor = HudAnchor.BottomCenter;
+    [SerializeField] private HudAnchor anchor = HudAnchor.TopRight;
     [Tooltip("相对锚点的偏移（像素，按 1080p 计）")]
-    [SerializeField] private Vector2 offset = new Vector2(0f, 36f);
+    [SerializeField] private Vector2 offset = new Vector2(32f, 32f);
     [Tooltip("在自动适配基础上再乘一个系数")]
     [Range(0.5f, 2f)]
     [SerializeField] private float scaleMultiplier = 1f;
@@ -32,15 +32,17 @@ public class Hud_StarEnergy : MonoBehaviour
 
     private GUIStyle _style;
 
+    private static Hud_StarEnergy _active;
+
     private void Awake()
     {
-        Hud_StarEnergy[] all = GetComponents<Hud_StarEnergy>();
-
-        if (all.Length > 1)
+        if (_active != null && _active != this)
         {
             Destroy(this);
             return;
         }
+
+        _active = this;
 
         if (wallet == null)
         {
@@ -50,6 +52,14 @@ public class Hud_StarEnergy : MonoBehaviour
         if (wallet == null)
         {
             wallet = FindObjectOfType<AbilityWallet>();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_active == this)
+        {
+            _active = null;
         }
     }
 
