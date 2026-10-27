@@ -58,6 +58,7 @@ public static class BlockArtTools
                         $"[ArtCheck] Mesh '{mesh.name}'  size=({size.x:F3}, {size.y:F3}, {size.z:F3})  "
                         + $"center=({center.x:F3}, {center.y:F3}, {center.z:F3})  "
                         + $"verts={mesh.vertexCount}  tris={mesh.triangles.Length / 3}  "
+                        + $"uv={mesh.uv.Length}  tangents={mesh.tangents.Length}  subMeshes={mesh.subMeshCount}  "
                         + $"size1m={sizeIsOne}  pivotCentered={pivotCentered}");
                 }
                 else if (asset is Material material)
