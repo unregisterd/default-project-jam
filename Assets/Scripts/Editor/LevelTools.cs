@@ -170,6 +170,17 @@ public static class LevelValidation
         return result;
     }
 
+    public static void ValidateHierarchy(GameObject root)
+    {
+        if (root == null)
+        {
+            Debug.LogWarning("[Validate] 根节点为空。");
+            return;
+        }
+
+        Validate(CollectBlocks(root.transform));
+    }
+
     private static void Validate(List<Block> blocks)
     {
         if (blocks.Count == 0)
