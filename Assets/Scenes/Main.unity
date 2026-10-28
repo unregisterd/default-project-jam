@@ -1589,6 +1589,7 @@ GameObject:
   - component: {fileID: 238314285}
   - component: {fileID: 238314292}
   - component: {fileID: 238314293}
+  - component: {fileID: 238314294}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1726,8 +1727,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 238314289}
-  maxPoints: 10
-  startPoints: 10
+  maxPoints: 6
+  startPoints: 6
   cooldown: 0.6
   courageHeight: 3.3
   courageForwardSpeed: 2
@@ -1757,6 +1758,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   landingBurst: {fileID: 0}
   heightOffset: 0.02
+--- !u!114 &238314294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 238314282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b13f84a60c29804185526f8dd7d6c6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wallet: {fileID: 0}
+  anchor: 2
+  offset: {x: 24, y: 109}
+  scaleMultiplier: 1
+  orbSize: 26
+  orbGap: 10
+  padding: 14
+  showHint: 1
 --- !u!1 &244590196
 GameObject:
   m_ObjectHideFlags: 0
@@ -2268,7 +2289,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &330691427
 MonoBehaviour:
   m_ObjectHideFlags: 0

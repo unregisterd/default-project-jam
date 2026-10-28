@@ -1,17 +1,19 @@
 ﻿using UnityEngine;
 
-public enum HudAnchor
-{
-    TopLeft = 0,
-    TopCenter = 1,
-    TopRight = 2,
-    BottomLeft = 3,
-    BottomCenter = 4,
-    BottomRight = 5,
-}
-
 public class Hud_StarEnergy : MonoBehaviour
 {
+    // 【修复报错】将枚举放在类内部，完美解决找不到或重复定义的问题
+    public enum HudAnchor
+    {
+        TopLeft = 0,
+        TopCenter = 1,
+        TopRight = 2,
+        BottomLeft = 3,
+        BottomCenter = 4,
+        BottomRight = 5,
+    }
+
+    // 【还原】完全保留你原本的文字和顺序！
     private const string HintText = "1 Courage  2 Wisdom  3 Patience  4 Hope";
 
     [SerializeField] private AbilityWallet wallet;
@@ -31,13 +33,13 @@ public class Hud_StarEnergy : MonoBehaviour
     [SerializeField] private bool showHint = true;
 
     private GUIStyle _style;
-
     private static Hud_StarEnergy _active;
 
     private void Awake()
     {
         if (_active != null && _active != this)
         {
+            // 【还原】只销毁脚本，不销毁整个物体
             Destroy(this);
             return;
         }
@@ -52,6 +54,19 @@ public class Hud_StarEnergy : MonoBehaviour
         if (wallet == null)
         {
             wallet = FindObjectOfType<AbilityWallet>();
+        }
+    }
+
+    private void Start()
+    {
+        if (wallet == null)
+        {
+            wallet = FindObjectOfType<AbilityWallet>();
+        }
+
+        if (wallet == null)
+        {
+            Debug.LogError("[Hud_StarEnergy] 找不到 AbilityWallet，星光条无法显示。", this);
         }
     }
 
@@ -70,7 +85,8 @@ public class Hud_StarEnergy : MonoBehaviour
             return;
         }
 
-        float scale = Mathf.Clamp(Screen.height / 1080f, 0.6f, 2.5f) * scaleMultiplier;
+        float screenScale = Mathf.Min(Screen.height / 1080f, Screen.width / 1920f);
+        float scale = Mathf.Clamp(screenScale * scaleMultiplier, 0.01f, 2.5f);
 
         if (_style == null)
         {
