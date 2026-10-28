@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -33,6 +34,16 @@ public static class BlockArtPipeline
         Debug.Log($"[ArtPipe] 已生成 {PrefabFolder}/Block_Art_Blue.prefab 与 Block_Art_Red.prefab");
     }
 
+    private static float GetModelRotationX(string color)
+    {
+        switch (color)
+        {
+            case "Blue":
+                return 90f;
+            default:
+                return 0f;
+        }
+    }
     private static void BuildArtPrefab(string color)
     {
         string modelPath = $"{BlocksRoot}/{color}/SM_Block_{color}.fbx";
@@ -46,19 +57,25 @@ public static class BlockArtPipeline
 
         GameObject root = new GameObject($"Block_Art_{color}");
 
-        GameObject model = (GameObject)PrefabUtility.InstantiatePrefab(modelAsset);
+        GameObject visual = new GameObject("Visual");
+        visual.transform.SetParent(root.transform, false);
+
+        GameObject model = (GameObject)PrefabUtility.InstantiatePrefab(modelAsset, visual.transform);
         model.name = "Model";
-        model.transform.SetParent(root.transform, false);
+        model.transform.localPosition = Vector3.zero;
+        model.transform.localRotation = Quaternion.Euler(GetModelRotationX(color), 0f, 0f);
+        model.transform.localScale = Vector3.one;
 
         Bounds bounds = CalculateBounds(model);
-        Vector3 size = bounds.size;
+        float largest = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y, bounds.size.z));
 
-        model.transform.localScale = new Vector3(
-            1f / Mathf.Max(size.x, 0.0001f),
-            1f / Mathf.Max(size.y, 0.0001f),
-            1f / Mathf.Max(size.z, 0.0001f));
+        if (largest > 0.0001f)
+        {
+            model.transform.localScale = Vector3.one * (1f / largest);
+        }
 
-        model.transform.localPosition = -bounds.center;
+        bounds = CalculateBounds(model);
+        model.transform.position -= bounds.center - root.transform.position;
 
         BoxCollider collider = root.AddComponent<BoxCollider>();
         collider.center = Vector3.zero;

@@ -26,7 +26,12 @@ public class BlockFeedback : MonoBehaviour
         _renderers = GetComponentsInChildren<Renderer>(true);
         _propertyBlock = new MaterialPropertyBlock();
 
-        Transform model = transform.Find("Model");
+        Transform model = transform.Find("Visual");
+
+        if (model == null)
+        {
+            model = transform.Find("Model");
+        }
 
         if (model == null)
         {
