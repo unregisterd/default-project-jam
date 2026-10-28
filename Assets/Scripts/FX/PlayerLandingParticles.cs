@@ -20,6 +20,8 @@ public class PlayerLandingParticles : MonoBehaviour
             _ripple = gameObject.AddComponent<RippleEmitter>();
         }
 
+        _ripple.Configure(false, 0.9f, 0.5f, 0.8f, 3.5f, 0.55f);
+
         if (landingBurst == null)
         {
             GameObject burstObject = GameObject.Find("FX_LandingBurst");

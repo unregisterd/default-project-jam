@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,7 +7,38 @@ public static class RippleSetup
     private const string ResourceFolder = "Assets/Resources/FX";
     private const string TexturePath = ResourceFolder + "/T_Ring.png";
     private const string MaterialPath = ResourceFolder + "/M_Ripple.mat";
+    private const string InkTexturePath = ResourceFolder + "/T_RippleInk.png";
 
+    [MenuItem("Tools/FX/Use Ink Ripple Texture")]
+    public static void UseInkTexture()
+    {
+        Texture2D ink = AssetDatabase.LoadAssetAtPath<Texture2D>(InkTexturePath);
+
+        if (ink == null)
+        {
+            Debug.LogError($"[Ripple] 找不到 {InkTexturePath}，先把水墨图放进去。");
+            return;
+        }
+
+        TextureImporter importer = AssetImporter.GetAtPath(InkTexturePath) as TextureImporter;
+
+        if (importer != null)
+        {
+            importer.textureType = TextureImporterType.Default;
+            importer.alphaIsTransparency = true;
+            importer.wrapMode = TextureWrapMode.Clamp;
+            importer.mipmapEnabled = true;
+            importer.SaveAndReimport();
+        }
+
+        Material material = GetOrCreateMaterial(ink);
+        material.SetTexture("_BaseMap", ink);
+        material.SetColor("_BaseColor", Color.white);
+        EditorUtility.SetDirty(material);
+        AssetDatabase.SaveAssets();
+
+        Debug.Log("[Ripple] 已把水墨圈贴图应用到 M_Ripple（加法混合，白墨发光）");
+    }
     [MenuItem("Tools/FX/Setup Ripple")]
     public static void Setup()
     {

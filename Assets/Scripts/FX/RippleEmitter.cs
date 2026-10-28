@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 [DisallowMultipleComponent]
@@ -10,8 +10,9 @@ public class RippleEmitter : MonoBehaviour
     [SerializeField] private float duration = 1.6f;
     [SerializeField] private float startAlpha = 0.5f;
     [SerializeField] private float heightOffset = 0.03f;
-    [SerializeField] private bool loop = true;
+    [SerializeField] private bool loop;
     [SerializeField] private float loopInterval = 0.9f;
+    [SerializeField] private bool randomRotation = true;
 
     private static Material _sharedMaterial;
 
@@ -24,6 +25,16 @@ public class RippleEmitter : MonoBehaviour
         public MaterialPropertyBlock Property;
         public float StartTime;
         public bool Active;
+    }
+
+    public void Configure(bool loopRings, float interval, float ringDuration, float scaleStart, float scaleEnd, float alpha)
+    {
+        loop = loopRings;
+        loopInterval = Mathf.Max(0.1f, interval);
+        duration = Mathf.Max(0.1f, ringDuration);
+        startScale = scaleStart;
+        endScale = scaleEnd;
+        startAlpha = alpha;
     }
 
     private void Awake()
@@ -123,6 +134,13 @@ public class RippleEmitter : MonoBehaviour
             Ripple ripple = _pool[i];
             ripple.Active = true;
             ripple.StartTime = Time.time + i * stagger;
+            ripple.Transform.localScale = Vector3.zero;
+
+            if (randomRotation)
+            {
+                ripple.Transform.localRotation = Quaternion.Euler(90f, Random.Range(0f, 360f), 0f);
+            }
+
             _pool[i] = ripple;
         }
     }

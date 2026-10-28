@@ -54,6 +54,8 @@ public class NpcSymbol : MonoBehaviour
             {
                 _ripple = gameObject.AddComponent<RippleEmitter>();
             }
+
+            _ripple.Configure(true, 2.4f, 3.2f, 1.2f, 6f, 0.32f);
         }
     }
 
