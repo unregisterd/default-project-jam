@@ -22,7 +22,10 @@ public class NpcSymbol : MonoBehaviour
     [SerializeField] private float worldTextWidth = 6f;
     [SerializeField] private bool createRipples = true;
 
+    [SerializeField] private AbilityWallet walletOverride;
+
     private AbilityWallet _wallet;
+    private float _nextWalletLookup;
     private Transform _player;
     private TextMeshPro _worldText;
     private RippleEmitter _ripple;
@@ -33,7 +36,7 @@ public class NpcSymbol : MonoBehaviour
 
     private void Awake()
     {
-        _wallet = FindObjectOfType<AbilityWallet>();
+        _wallet = walletOverride != null ? walletOverride : FindObjectOfType<AbilityWallet>();
         PlayerBlockAgent agent = FindObjectOfType<PlayerBlockAgent>();
 
         if (agent != null)
@@ -56,6 +59,8 @@ public class NpcSymbol : MonoBehaviour
 
     private void Update()
     {
+        EnsureWallet();
+
         if (_player == null)
         {
             return;
@@ -91,6 +96,26 @@ public class NpcSymbol : MonoBehaviour
         }
     }
 
+    private void EnsureWallet()
+    {
+        if (_wallet != null)
+        {
+            return;
+        }
+
+        if (Time.time < _nextWalletLookup)
+        {
+            return;
+        }
+
+        _nextWalletLookup = Time.time + 1f;
+        _wallet = FindObjectOfType<AbilityWallet>();
+
+        if (_wallet == null)
+        {
+            Debug.LogWarning("[NPC] 场景里还没有 AbilityWallet（确认 Player 上挂了 AbilityController）");
+        }
+    }
     private void TryClaim()
     {
         if (_wallet == null)

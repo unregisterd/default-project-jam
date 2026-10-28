@@ -82,6 +82,11 @@ public class Hud_StarEnergy : MonoBehaviour
     {
         if (wallet == null)
         {
+            wallet = FindObjectOfType<AbilityWallet>();
+        }
+
+        if (wallet == null)
+        {
             return;
         }
 
