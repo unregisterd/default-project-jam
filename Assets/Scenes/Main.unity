@@ -1775,9 +1775,9 @@ MonoBehaviour:
   anchor: 2
   offset: {x: 24, y: 8}
   scaleMultiplier: 1
-  orbSize: 35
-  orbGap: 14
-  padding: 20
+  orbSize: 30
+  orbGap: 15
+  padding: 18
 --- !u!1 &244590196
 GameObject:
   m_ObjectHideFlags: 0

@@ -92,6 +92,53 @@ public static class BlockArtPipeline
         PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
         Object.DestroyImmediate(root);
     }
+    [MenuItem("Tools/Art/Build Born Prefab")]
+    public static void BuildBornPrefab()
+    {
+        const string modelPath = "Assets/Art/Props/Born/SM_Born.fbx";
+        const string prefabPath = "Assets/Prefabs/Props/Born.prefab";
+
+        GameObject modelAsset = AssetDatabase.LoadAssetAtPath<GameObject>(modelPath);
+
+        if (modelAsset == null)
+        {
+            Debug.LogError($"[ArtPipe] 找不到 {modelPath}");
+            return;
+        }
+
+        GameObject root = new GameObject("Born");
+
+        GameObject model = (GameObject)PrefabUtility.InstantiatePrefab(modelAsset);
+        model.name = "Model";
+        model.transform.SetParent(root.transform, false);
+
+        Bounds bounds = CalculateBounds(model);
+        Vector3 size = bounds.size;
+
+        model.transform.position -= new Vector3(bounds.center.x, bounds.min.y, bounds.center.z);
+
+        BoxCollider collider = root.AddComponent<BoxCollider>();
+        collider.center = new Vector3(0f, size.y * 0.5f, 0f);
+        collider.size = size;
+
+        Material material = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialFolder}/M_Born.mat");
+        Renderer[] renderers = root.GetComponentsInChildren<Renderer>(true);
+
+        if (material != null)
+        {
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.sharedMaterial = material;
+            }
+        }
+
+        EnsureFolder("Assets/Prefabs/Props");
+        PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
+        Object.DestroyImmediate(root);
+        AssetDatabase.SaveAssets();
+
+        Debug.Log($"[ArtPipe] 已生成 {prefabPath}：尺寸 {size.x:F2} × {size.y:F2} × {size.z:F2} m，pivot 在底面中心，碰撞体已贴合");
+    }
     [MenuItem("Tools/Art/Build Prop Materials")]
     public static void BuildPropMaterials()
     {
