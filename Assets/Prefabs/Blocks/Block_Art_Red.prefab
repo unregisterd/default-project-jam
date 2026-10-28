@@ -68,7 +68,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f141918fe587c141aa9096bf13cdac8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: {fileID: 0}
+  type: {fileID: 11400000, guid: b6ff3457859fb58469f5f23ce4b0dcef, type: 2}
   palette: {fileID: 11400000, guid: dcabdb554f96dda41ac71e8739cd02de, type: 2}
   view: {fileID: 8447124539433519604}
   canRaise: 1
@@ -130,12 +130,12 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 654919f9a525e8c48a3e5e6b491ccc62,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 19.996355
+      value: 20.000002
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 654919f9a525e8c48a3e5e6b491ccc62,
         type: 3}
       propertyPath: m_LocalScale.y
-      value: 19.996355
+      value: 19.999996
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 654919f9a525e8c48a3e5e6b491ccc62,
         type: 3}
@@ -150,7 +150,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 654919f9a525e8c48a3e5e6b491ccc62,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.4999089
+      value: 0.4999999
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 654919f9a525e8c48a3e5e6b491ccc62,
         type: 3}
