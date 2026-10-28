@@ -39,7 +39,7 @@ public static class BlockArtPipeline
         switch (color)
         {
             case "Blue":
-                return 90f;
+                return -90f;
             default:
                 return 0f;
         }
@@ -67,15 +67,17 @@ public static class BlockArtPipeline
         model.transform.localScale = Vector3.one;
 
         Bounds bounds = CalculateBounds(model);
-        float largest = Mathf.Max(bounds.size.x, Mathf.Max(bounds.size.y, bounds.size.z));
+        Vector3 modelSize = bounds.size;
 
-        if (largest > 0.0001f)
-        {
-            model.transform.localScale = Vector3.one * (1f / largest);
-        }
+        model.transform.localScale = new Vector3(
+            1f / Mathf.Max(modelSize.x, 0.0001f),
+            1f / Mathf.Max(modelSize.y, 0.0001f),
+            1f / Mathf.Max(modelSize.z, 0.0001f));
 
         bounds = CalculateBounds(model);
         model.transform.position -= bounds.center - root.transform.position;
+        bounds = CalculateBounds(model);
+        Debug.Log($"[ArtPipe] {color} 视觉尺寸 {bounds.size.x:F3} × {bounds.size.y:F3} × {bounds.size.z:F3} m（碰撞体 1×1×1）");
 
         BoxCollider collider = root.AddComponent<BoxCollider>();
         collider.center = Vector3.zero;
