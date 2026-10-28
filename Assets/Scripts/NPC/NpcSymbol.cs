@@ -158,7 +158,10 @@ public class NpcSymbol : MonoBehaviour
             line += "\n" + _promptLine;
         }
 
-        NpcPromptHud.Show(speaker, line);
+        if (UITextManager.Instance != null)
+        {
+            UITextManager.Instance.ShowText(string.IsNullOrEmpty(speaker) ? line : speaker + "\n" + line, 0f, true);
+        }
 
         if (_worldText != null)
         {
@@ -171,7 +174,10 @@ public class NpcSymbol : MonoBehaviour
     private void HideText()
     {
         _promptLine = string.Empty;
-        NpcPromptHud.Clear(Loc.Speaker(dialogueId));
+        if (UITextManager.Instance != null)
+        {
+            UITextManager.Instance.HideText();
+        }
 
         if (_worldText != null)
         {
@@ -195,7 +201,7 @@ public class NpcSymbol : MonoBehaviour
         _worldText.outlineColor = Color.white;
         _worldText.raycastTarget = false;
 
-        TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts/SourceHanSansCN SDF");
+        TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts/SourceHanSansCN-VF-2 SDF");
 
         if (font == null)
         {
