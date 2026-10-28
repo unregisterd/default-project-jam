@@ -163,8 +163,9 @@ public class NpcSymbol : MonoBehaviour
         _worldText.fontSize = 3f;
         _worldText.enableWordWrapping = true;
         _worldText.rectTransform.sizeDelta = new Vector2(worldTextWidth, 3f);
-        _worldText.outlineWidth = 0.2f;
-        _worldText.outlineColor = Color.black;
+        _worldText.color = Color.black;
+        _worldText.outlineWidth = 0.25f;
+        _worldText.outlineColor = Color.white;
         _worldText.raycastTarget = false;
 
         TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts/SourceHanSansCN SDF");

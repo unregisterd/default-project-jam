@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
 public class NpcPromptHud : MonoBehaviour
@@ -26,7 +26,7 @@ public class NpcPromptHud : MonoBehaviour
         }
     }
 
-    public static void Show(string speaker, string line, float duration = 0.6f)
+    public static void Show(string speaker, string line, float duration = 999f)
     {
         NpcPromptHud hud = Instance;
         hud._speaker = speaker;
@@ -70,13 +70,15 @@ public class NpcPromptHud : MonoBehaviour
 
         _speakerStyle.fontSize = Mathf.RoundToInt(20f * scale);
         _lineStyle.fontSize = Mathf.RoundToInt(24f * scale);
+        _speakerStyle.normal.textColor = Color.black;
+        _lineStyle.normal.textColor = Color.black;
 
         float width = Mathf.Min(Screen.width * 0.7f, 900f * scale);
         float x = (Screen.width - width) * 0.5f;
         float y = 40f * scale;
 
         Color previous = GUI.color;
-        GUI.color = new Color(0f, 0f, 0f, 0.45f);
+        GUI.color = new Color(1f, 1f, 1f, 0.72f);
         GUI.DrawTexture(new Rect(x - 16f * scale, y - 10f * scale, width + 32f * scale, 96f * scale), Texture2D.whiteTexture);
         GUI.color = previous;
 
