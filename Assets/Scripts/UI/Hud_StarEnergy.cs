@@ -14,8 +14,6 @@ public class Hud_StarEnergy : MonoBehaviour
     }
 
     // 【还原】完全保留你原本的文字和顺序！
-    private const string HintText = "1 Courage  2 Wisdom  3 Patience  4 Hope";
-
     [SerializeField] private AbilityWallet wallet;
 
     [Header("位置")]
@@ -30,7 +28,6 @@ public class Hud_StarEnergy : MonoBehaviour
     [SerializeField] private float orbSize = 26f;
     [SerializeField] private float orbGap = 10f;
     [SerializeField] private float padding = 14f;
-    [SerializeField] private bool showHint = true;
 
     private GUIStyle _style;
     private static Hud_StarEnergy _active;
@@ -109,9 +106,7 @@ public class Hud_StarEnergy : MonoBehaviour
         float pad = padding * scale;
 
         float orbsWidth = wallet.MaxPoints * size + Mathf.Max(0, wallet.MaxPoints - 1) * gap;
-        float hintWidth = showHint ? _style.CalcSize(new GUIContent(HintText)).x + 12f * scale : 0f;
-
-        float contentWidth = orbsWidth + hintWidth;
+        float contentWidth = orbsWidth;
         float contentHeight = size;
         float panelWidth = contentWidth + pad * 2f;
         float panelHeight = contentHeight + pad * 2f;
@@ -135,14 +130,6 @@ public class Hud_StarEnergy : MonoBehaviour
         }
 
         GUI.color = previous;
-
-        if (showHint)
-        {
-            GUI.Label(
-                new Rect(orbX + 12f * scale, panel.y + pad - 2f * scale, hintWidth, size + 4f * scale),
-                HintText,
-                _style);
-        }
     }
 
     private Vector2 ResolvePosition(float width, float height, float scale)

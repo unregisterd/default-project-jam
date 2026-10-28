@@ -121,9 +121,9 @@ MonoBehaviour:
   ability: 3
   points: 4
   dialogueId: npc_cloud_line
-  abilityDescId: ability_hope_desc
-  range: 3.5
-  retryInterval: 0.5
+  abilityDescId: 
+  range: 3
+  retryInterval: 3
   worldTextHeight: 2.2
   worldTextWidth: 6
   createRipples: 1

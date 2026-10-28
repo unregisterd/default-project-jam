@@ -122,8 +122,8 @@ MonoBehaviour:
   points: 3
   dialogueId: npc_bird_line
   abilityDescId: 
-  range: 3.5
-  retryInterval: 0.5
+  range: 3
+  retryInterval: 3
   worldTextHeight: 2.2
   worldTextWidth: 6
   createRipples: 1

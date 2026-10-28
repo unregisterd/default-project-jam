@@ -122,8 +122,8 @@ MonoBehaviour:
   points: 2
   dialogueId: npc_light_line
   abilityDescId: 
-  range: 3.5
-  retryInterval: 0.93
+  range: 3
+  retryInterval: 3
   worldTextHeight: 2.2
   worldTextWidth: 6
   createRipples: 1
