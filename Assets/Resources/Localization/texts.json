@@ -1,0 +1,268 @@
+{
+  "game_title": {
+    "zh": "逐星",
+    "en": "Chasing the Star"
+  },
+  "texts": [
+    {
+      "id": "intro_opening",
+      "type": "opening_text",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "很久很久以前……",
+        "en": "Long, long ago…"
+      },
+      "note": "黑屏开场文字，会显示"
+    },
+    {
+      "id": "intro_narration",
+      "type": "narration",
+      "speaker": {
+        "zh": "旁白",
+        "en": "Narrator"
+      },
+      "text": {
+        "zh": "传说，在世界的最高处，有一颗永不熄灭的星星，世人都想寻找到它。小骑士，系紧行囊，你该出发了。",
+        "en": "It is said that at the top of the world burns a star that never goes out. Everyone wants to find it. Little knight, tighten your pack. It is time to go."
+      },
+      "note": ""
+    },
+    {
+      "id": "intro_hint",
+      "type": "operation_hint",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "WASD 移动，空格跳跃。",
+        "en": "WASD to move, Space to jump."
+      },
+      "note": "操作提示，显示"
+    },
+    {
+      "id": "npc_light_line",
+      "type": "dialogue",
+      "speaker": {
+        "zh": "暗夜提灯",
+        "en": "Night Lantern"
+      },
+      "text": {
+        "zh": "路这么黑，带着这盏灯走吧。",
+        "en": "The road is dark. Take this lantern with you."
+      },
+      "note": "NPC：暗夜提灯（勇气）"
+    },
+    {
+      "id": "ability_courage_get",
+      "type": "system",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "获得能力点：勇气",
+        "en": "Ability gained: Courage"
+      },
+      "note": ""
+    },
+    {
+      "id": "ability_courage_desc",
+      "type": "system",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "消耗 1 点星光，跃起约 3 米高。",
+        "en": "Spend 1 Star Energy to leap about 3 meters high."
+      },
+      "note": "能力说明"
+    },
+    {
+      "id": "npc_bird_line",
+      "type": "dialogue",
+      "speaker": {
+        "zh": "智慧之鸟",
+        "en": "Wise Bird"
+      },
+      "text": {
+        "zh": "前面没路了？骑士，别担心，世上原本就没有路……",
+        "en": "No more road ahead? Don't worry, knight. There never was a road…"
+      },
+      "note": "NPC：智慧之鸟（智慧）"
+    },
+    {
+      "id": "ability_wisdom_get",
+      "type": "system",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "获得能力点：智慧",
+        "en": "Ability gained: Wisdom"
+      },
+      "note": ""
+    },
+    {
+      "id": "ability_wisdom_desc",
+      "type": "system",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "消耗 1 点星光，点亮半径 12 米内的隐藏方块或道路。",
+        "en": "Spend 1 Star Energy to reveal hidden blocks within 12 meters."
+      },
+      "note": "能力说明"
+    },
+    {
+      "id": "npc_sword_line",
+      "type": "dialogue",
+      "speaker": {
+        "zh": "断剑骑士",
+        "en": "Broken Sword Knight"
+      },
+      "text": {
+        "zh": "你是去找星星的？骑士，别想了，我什么也没找到，才折返至此。",
+        "en": "You're looking for the star? Don't bother, knight. I found nothing, and turned back."
+      },
+      "note": "NPC：断剑骑士（耐心）"
+    },
+    {
+      "id": "ability_patience_get",
+      "type": "system",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "获得能力点：耐心",
+        "en": "Ability gained: Patience"
+      },
+      "note": ""
+    },
+    {
+      "id": "ability_patience_desc",
+      "type": "system",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "消耗 1 点星光，让脚下的方块上升 2 米。",
+        "en": "Spend 1 Star Energy to raise the block under your feet by 2 meters."
+      },
+      "note": "能力说明"
+    },
+    {
+      "id": "npc_cloud_line",
+      "type": "dialogue",
+      "speaker": {
+        "zh": "希望祥云",
+        "en": "Hope Cloud"
+      },
+      "text": {
+        "zh": "够不着的地方，不如就自己创造一个落脚点。",
+        "en": "If you can't reach it, make your own footing."
+      },
+      "note": "NPC：希望祥云（希望）"
+    },
+    {
+      "id": "ability_hope_get",
+      "type": "system",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "获得能力点：希望",
+        "en": "Ability gained: Hope"
+      },
+      "note": ""
+    },
+    {
+      "id": "ability_hope_desc",
+      "type": "system",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "消耗 2 点星光，在前方生成一块临时平台（存在 10 秒，最后 2 秒闪烁）。",
+        "en": "Spend 2 Star Energy to summon a temporary platform ahead (lasts 10 seconds, blinks for the last 2)."
+      },
+      "note": "能力说明"
+    },
+    {
+      "id": "ending_narration",
+      "type": "narration",
+      "speaker": {
+        "zh": "旁白",
+        "en": "Narrator"
+      },
+      "text": {
+        "zh": "到了，这里就是世界的最高处。小骑士，前方什么也没有。或许星星只是一个传说，一个你梦中的美丽幻影，又或许……",
+        "en": "You've arrived. This is the highest place in the world. Little knight, there is nothing ahead. Perhaps the star was only a legend—a beautiful dream in your sleep. Or perhaps…"
+      },
+      "note": ""
+    },
+    {
+      "id": "ending_jump_hint",
+      "type": "system",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "再跳一步",
+        "en": "One more jump."
+      },
+      "note": "系统提示"
+    },
+    {
+      "id": "ending_question",
+      "type": "narration",
+      "speaker": {
+        "zh": "旁白",
+        "en": "Narrator"
+      },
+      "text": {
+        "zh": "你找到那颗永不熄灭的星星了吗？",
+        "en": "Did you find the star that never goes out?"
+      },
+      "note": "星空停留"
+    },
+    {
+      "id": "ending_continue",
+      "type": "operation_hint",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "点击任意键继续",
+        "en": "Press any key to continue."
+      },
+      "note": "UI提示，显示"
+    },
+    {
+      "id": "ending_loop",
+      "type": "narration",
+      "speaker": {
+        "zh": "旁白",
+        "en": "Narrator"
+      },
+      "text": {
+        "zh": "传说，在世界最高处，有一颗永不熄灭的星星。",
+        "en": "It is said that at the top of the world burns a star that never goes out."
+      },
+      "note": "回到起点，循环"
+    }
+  ]
+}

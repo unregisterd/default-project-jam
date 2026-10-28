@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerLandingParticles : MonoBehaviour
 {
@@ -6,11 +6,19 @@ public class PlayerLandingParticles : MonoBehaviour
     [SerializeField] private float heightOffset = 0.02f;
 
     private CharacterController _controller;
+    private RippleEmitter _ripple;
     private bool _wasGrounded = true;
 
     private void Awake()
     {
         _controller = GetComponent<CharacterController>();
+
+        _ripple = GetComponent<RippleEmitter>();
+
+        if (_ripple == null)
+        {
+            _ripple = gameObject.AddComponent<RippleEmitter>();
+        }
 
         if (landingBurst == null)
         {
@@ -32,10 +40,18 @@ public class PlayerLandingParticles : MonoBehaviour
 
         bool grounded = _controller.isGrounded;
 
-        if (grounded && !_wasGrounded && landingBurst != null)
+        if (grounded && !_wasGrounded)
         {
-            landingBurst.transform.position = transform.position + Vector3.up * heightOffset;
-            landingBurst.Play();
+            if (landingBurst != null)
+            {
+                landingBurst.transform.position = transform.position + Vector3.up * heightOffset;
+                landingBurst.Play();
+            }
+
+            if (_ripple != null)
+            {
+                _ripple.PlayOnce();
+            }
         }
 
         _wasGrounded = grounded;
