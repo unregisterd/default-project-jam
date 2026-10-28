@@ -133,8 +133,8 @@ public class UITextManager : MonoBehaviour
         }
 
         controlsText.text = Loc.Language == "en"
-            ? "WASD move   Space jump   1 Courage   2 Wisdom   3 Patience   4 Hope"
-            : "WASD 移动   空格 跳跃   1 勇气   2 智慧   3 耐心   4 希望";
+            ? "1 Courage   2 Wisdom   3 Patience   4 Hope"
+            : "1 勇气   2 智慧   3 耐心   4 希望";
     }
 
     private static void SetAlpha(TextMeshProUGUI text, float alpha)

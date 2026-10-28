@@ -92,6 +92,74 @@ public static class BlockArtPipeline
         PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
         Object.DestroyImmediate(root);
     }
+    [MenuItem("Tools/Art/Build Prop Materials")]
+    public static void BuildPropMaterials()
+    {
+        const string propsRoot = "Assets/Art/Props";
+
+        if (!AssetDatabase.IsValidFolder(propsRoot))
+        {
+            Debug.LogWarning($"[ArtPipe] 没有 {propsRoot} 目录");
+            return;
+        }
+
+        EnsureFolder(MaterialFolder);
+
+        foreach (string folder in AssetDatabase.GetSubFolders(propsRoot))
+        {
+            string propName = Path.GetFileName(folder);
+            Texture2D baseColor = FindTexture(folder, "basecolor");
+            Texture2D normal = FindTexture(folder, "normal");
+            Texture2D roughness = FindTexture(folder, "roughness");
+
+            Material material = BuildPropMaterial($"M_{propName}", baseColor, normal, roughness);
+
+            if (material != null)
+            {
+                Debug.Log($"[ArtPipe] 已生成 {AssetDatabase.GetAssetPath(material)}（baseColor={(baseColor != null)} normal={(normal != null)}）");
+            }
+        }
+
+        AssetDatabase.SaveAssets();
+    }
+
+    private static Material BuildPropMaterial(string materialName, Texture2D baseColor, Texture2D normal, Texture2D roughness)
+    {
+        string path = $"{MaterialFolder}/{materialName}.mat";
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+
+        if (shader == null)
+        {
+            Debug.LogError("[ArtPipe] 找不到 URP Lit shader");
+            return null;
+        }
+
+        if (material == null)
+        {
+            material = new Material(shader);
+            AssetDatabase.CreateAsset(material, path);
+        }
+
+        if (baseColor != null)
+        {
+            material.SetTexture("_BaseMap", baseColor);
+            material.SetColor("_BaseColor", Color.white);
+        }
+
+        if (normal != null)
+        {
+            material.SetTexture("_BumpMap", normal);
+            material.EnableKeyword("_NORMALMAP");
+        }
+
+        float smoothness = roughness != null ? Mathf.Clamp01(1f - SampleAverage(roughness).r) : 0.4f;
+        material.SetFloat("_Smoothness", smoothness);
+        material.SetFloat("_Metallic", 0f);
+        material.enableInstancing = true;
+        EditorUtility.SetDirty(material);
+        return material;
+    }
     [MenuItem("Tools/Art/Enable Emission (Block Materials)")]
     public static void EnableEmissionOnMaterials()
     {

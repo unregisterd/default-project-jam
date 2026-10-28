@@ -75,7 +75,7 @@ public static class BlockArtTools
     [MenuItem("Tools/Art/Fix Block Textures")]
     public static void FixBlockTextures()
     {
-        string[] guids = AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Art/Blocks" });
+        string[] guids = AssetDatabase.FindAssets("t:Texture2D", new[] { "Assets/Art/Blocks", "Assets/Art/Props" });
         int changed = 0;
 
         foreach (string guid in guids)
