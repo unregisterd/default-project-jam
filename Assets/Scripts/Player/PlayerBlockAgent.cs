@@ -9,7 +9,9 @@ public class PlayerBlockAgent : MonoBehaviour
     [SerializeField] private LayerMask groundMask = ~0;
     [Tooltip("从脚底向下探测方块的距离")]
     [SerializeField] private float groundProbeDistance = 0.35f;
-    [Tooltip("掉到这个高度以下就回到上一个安全位置")]
+    [Tooltip("掉到低于最后站立方块多少米就回退（推荐 3~5）")]
+    [SerializeField] private float fallDepth = 3.5f;
+    [Tooltip("绝对兜底高度（找不到最后方块时使用）")]
     [SerializeField] private float fallRespawnY = -12f;
 
     [Header("落地音效")]
@@ -28,6 +30,8 @@ public class PlayerBlockAgent : MonoBehaviour
 
     private CharacterController _controller;
     private Block _standingBlock;
+    private Block _lastStandingBlock;
+    private float _lastStandingTop;
     private Vector3 _lastSafePosition;
     private AudioSource _audio;
     private float _stepAccumulator;
@@ -71,9 +75,9 @@ public class PlayerBlockAgent : MonoBehaviour
 
     private void Update()
     {
-        if (transform.position.y < fallRespawnY)
+        if (ShouldRespawn())
         {
-            RespawnAt(_lastSafePosition);
+            RespawnOnLastBlock();
             return;
         }
 
@@ -106,6 +110,9 @@ public class PlayerBlockAgent : MonoBehaviour
             StandingBlockChanged?.Invoke(under);
         }
 
+        _lastStandingBlock = under;
+        _lastStandingTop = under.GetTopHeight();
+
         _lastSafePosition = transform.position;
     }
 
@@ -131,6 +138,38 @@ public class PlayerBlockAgent : MonoBehaviour
         }
 
         return transform.position.y;
+    }
+
+    private bool ShouldRespawn()
+    {
+        if (_lastStandingBlock != null && _lastStandingBlock.gameObject.activeInHierarchy)
+        {
+            return transform.position.y < _lastStandingTop - fallDepth;
+        }
+
+        return transform.position.y < fallRespawnY;
+    }
+
+    private void RespawnOnLastBlock()
+    {
+        Block block = _lastStandingBlock;
+
+        if (block == null)
+        {
+            RespawnAt(_lastSafePosition);
+            Debug.Log("[Agent] 掉出地图，回到上一个安全点");
+            return;
+        }
+
+        Collider collider = block.GetComponentInChildren<Collider>();
+        Vector3 center = collider != null ? collider.bounds.center : block.transform.position;
+        float top = block.GetTopHeight();
+        float feetOffset = transform.position.y - GetFeetY();
+        Vector3 target = new Vector3(center.x, top + 0.06f + feetOffset, center.z);
+
+        RespawnAt(target);
+        _wasGrounded = true;
+        Debug.Log($"[Agent] 掉落，回到方块 {block.name}（顶面 {top:F1}m）");
     }
 
     public void RespawnAt(Vector3 position)
