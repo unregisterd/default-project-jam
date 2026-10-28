@@ -30,6 +30,7 @@ public class Hud_StarEnergy : MonoBehaviour
     [SerializeField] private float padding = 14f;
 
     private GUIStyle _style;
+    private Texture2D _starTexture;
     private static Hud_StarEnergy _active;
 
     private void Awake()
@@ -52,6 +53,8 @@ public class Hud_StarEnergy : MonoBehaviour
         {
             wallet = FindObjectOfType<AbilityWallet>();
         }
+
+        _starTexture = Resources.Load<Texture2D>("UI/T_StarEnergy");
     }
 
     private void Start()
@@ -124,8 +127,17 @@ public class Hud_StarEnergy : MonoBehaviour
         for (int i = 0; i < wallet.MaxPoints; i++)
         {
             bool filled = i < wallet.Points;
-            GUI.color = filled ? new Color(1f, 0.85f, 0.38f) : new Color(0.28f, 0.28f, 0.32f);
-            GUI.DrawTexture(new Rect(orbX, orbY, size, size), Texture2D.whiteTexture);
+            GUI.color = filled ? Color.white : new Color(0.22f, 0.22f, 0.26f, 0.55f);
+
+            if (_starTexture != null)
+            {
+                GUI.DrawTexture(new Rect(orbX, orbY, size, size), _starTexture, ScaleMode.ScaleToFit, true);
+            }
+            else
+            {
+                GUI.DrawTexture(new Rect(orbX, orbY, size, size), Texture2D.whiteTexture);
+            }
+
             orbX += size + gap;
         }
 
