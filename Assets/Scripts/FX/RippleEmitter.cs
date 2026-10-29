@@ -1,28 +1,21 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public enum RippleStyle
-{
-    Ink = 0,
-    CrystalPlayer = 1,
-    CrystalNpc = 2,
-}
-
 [DisallowMultipleComponent]
 public class RippleEmitter : MonoBehaviour
 {
     [SerializeField] private int poolSize = 4;
-    [SerializeField] private RippleStyle style = RippleStyle.Ink;
     [SerializeField] private float startScale = 0.6f;
     [SerializeField] private float endScale = 3.2f;
-    [SerializeField] private float duration = 1.6f;
-    [SerializeField] private float startAlpha = 0.5f;
+    [SerializeField] private float duration = 1.2f;
+    [SerializeField] private float startAlpha = 0.75f;
     [SerializeField] private float heightOffset = 0.03f;
     [SerializeField] private bool loop;
-    [SerializeField] private float loopInterval = 0.9f;
+    [SerializeField] private float loopInterval = 1.6f;
     [SerializeField] private bool randomRotation = true;
 
-    private static readonly Dictionary<RippleStyle, Material> Materials = new Dictionary<RippleStyle, Material>();
+    private static Material _sharedMaterial;
+    private static Mesh _ringMesh;
 
     private readonly List<Ripple> _pool = new List<Ripple>();
     private float _nextLoopTime;
@@ -35,49 +28,34 @@ public class RippleEmitter : MonoBehaviour
         public bool Active;
     }
 
-    public void Configure(bool loopRings, float interval, float ringDuration, float scaleStart, float scaleEnd, float alpha, RippleStyle rippleStyle)
+    public void Configure(bool loopRings, float interval, float ringDuration, float scaleStart, float scaleEnd, float alpha)
     {
         loop = loopRings;
         loopInterval = Mathf.Max(0.1f, interval);
-        duration = Mathf.Max(0.1f, ringDuration);
+        duration = Mathf.Max(0.05f, ringDuration);
         startScale = scaleStart;
         endScale = scaleEnd;
         startAlpha = alpha;
-        style = rippleStyle;
-    }
-
-    public void Configure(bool loopRings, float interval, float ringDuration, float scaleStart, float scaleEnd, float alpha)
-    {
-        Configure(loopRings, interval, ringDuration, scaleStart, scaleEnd, alpha, style);
     }
 
     private void Awake()
     {
-        Material material = GetMaterial(style);
+        EnsureResources();
 
         for (int i = 0; i < Mathf.Max(1, poolSize); i++)
         {
-            GameObject ring = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            ring.name = "RippleRing";
+            GameObject ring = new GameObject("RippleRing");
             ring.transform.SetParent(transform, false);
-            ring.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            ring.transform.localPosition = new Vector3(0f, heightOffset, 0f);
             ring.transform.localScale = Vector3.zero;
 
-            Collider collider = ring.GetComponent<Collider>();
+            MeshFilter filter = ring.AddComponent<MeshFilter>();
+            filter.sharedMesh = _ringMesh;
 
-            if (collider != null)
-            {
-                Destroy(collider);
-            }
-
-            Renderer renderer = ring.GetComponent<Renderer>();
-
-            if (renderer != null)
-            {
-                renderer.sharedMaterial = material;
-                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                renderer.receiveShadows = false;
-            }
+            MeshRenderer renderer = ring.AddComponent<MeshRenderer>();
+            renderer.sharedMaterial = _sharedMaterial;
+            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            renderer.receiveShadows = false;
 
             _pool.Add(new Ripple
             {
@@ -101,6 +79,10 @@ public class RippleEmitter : MonoBehaviour
             PlayOnce();
         }
 
+        Color moodColor = SkyMoodController.Instance != null
+            ? SkyMoodController.Instance.RippleColor
+            : new Color(1f, 0.86f, 0.8f);
+
         for (int i = 0; i < _pool.Count; i++)
         {
             Ripple ripple = _pool[i];
@@ -122,16 +104,17 @@ public class RippleEmitter : MonoBehaviour
 
             float eased = 1f - (1f - progress) * (1f - progress);
             float scale = Mathf.Lerp(startScale, endScale, eased);
-            float alpha = Mathf.Lerp(startAlpha, 0f, progress);
+            float alpha = Mathf.Lerp(startAlpha, 0f, progress * progress);
 
-            ripple.Transform.localScale = new Vector3(scale, scale, 1f);
-            ripple.Transform.localPosition = new Vector3(0f, heightOffset, 0f);
+            ripple.Transform.localScale = new Vector3(scale, scale, scale);
 
             Renderer renderer = ripple.Transform.GetComponent<Renderer>();
 
             if (renderer != null)
             {
-                ripple.Property.SetColor("_BaseColor", new Color(1f, 1f, 1f, alpha));
+                Color color = moodColor;
+                color.a = alpha;
+                ripple.Property.SetColor("_BaseColor", color);
                 renderer.SetPropertyBlock(ripple.Property);
             }
 
@@ -141,7 +124,7 @@ public class RippleEmitter : MonoBehaviour
 
     public void PlayOnce()
     {
-        float stagger = 0.18f;
+        float stagger = 0.16f;
 
         for (int i = 0; i < _pool.Count; i++)
         {
@@ -152,58 +135,75 @@ public class RippleEmitter : MonoBehaviour
 
             if (randomRotation)
             {
-                ripple.Transform.localRotation = Quaternion.Euler(90f, Random.Range(0f, 360f), 0f);
+                ripple.Transform.localRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
             }
 
             _pool[i] = ripple;
         }
     }
 
-    private static Material GetMaterial(RippleStyle rippleStyle)
+    private static void EnsureResources()
     {
-        if (Materials.TryGetValue(rippleStyle, out Material cached) && cached != null)
+        if (_ringMesh == null)
         {
-            return cached;
+            _ringMesh = BuildHexagonRing();
         }
 
-        string path;
-
-        switch (rippleStyle)
+        if (_sharedMaterial != null)
         {
-            case RippleStyle.CrystalPlayer:
-                path = "FX/M_RipplePlayer";
-                break;
-            case RippleStyle.CrystalNpc:
-                path = "FX/M_RippleNpc";
-                break;
-            default:
-                path = "FX/M_Ripple";
-                break;
+            return;
         }
 
-        Material material = Resources.Load<Material>(path);
+        Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+        _sharedMaterial = new Material(shader);
+        _sharedMaterial.SetFloat("_Surface", 1f);
+        _sharedMaterial.SetFloat("_Blend", 0f);
+        _sharedMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        _sharedMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
+        _sharedMaterial.SetInt("_ZWrite", 0);
+        _sharedMaterial.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        _sharedMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+        _sharedMaterial.SetColor("_BaseColor", Color.white);
+    }
 
-        if (material == null)
+    private static Mesh BuildHexagonRing()
+    {
+        const int sides = 6;
+        float inner = 1f - 0.12f;
+
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangles = new List<int>();
+
+        for (int i = 0; i < sides; i++)
         {
-            Debug.LogWarning($"[Ripple] 找不到 Resources/{path}，回退到 M_Ripple");
-            material = Resources.Load<Material>("FX/M_Ripple");
+            float a0 = (i / (float)sides) * Mathf.PI * 2f;
+            float a1 = ((i + 1) / (float)sides) * Mathf.PI * 2f;
+
+            Vector3 inner0 = new Vector3(Mathf.Cos(a0), 0f, Mathf.Sin(a0)) * inner;
+            Vector3 outer0 = new Vector3(Mathf.Cos(a0), 0f, Mathf.Sin(a0));
+            Vector3 inner1 = new Vector3(Mathf.Cos(a1), 0f, Mathf.Sin(a1)) * inner;
+            Vector3 outer1 = new Vector3(Mathf.Cos(a1), 0f, Mathf.Sin(a1));
+
+            int start = vertices.Count;
+            vertices.Add(inner0);
+            vertices.Add(outer0);
+            vertices.Add(inner1);
+            vertices.Add(outer1);
+
+            triangles.Add(start);
+            triangles.Add(start + 2);
+            triangles.Add(start + 1);
+
+            triangles.Add(start + 1);
+            triangles.Add(start + 2);
+            triangles.Add(start + 3);
         }
 
-        if (material == null)
-        {
-            Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
-            material = new Material(shader);
-            material.SetFloat("_Surface", 1f);
-            material.SetFloat("_Blend", 0f);
-            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
-            material.SetInt("_ZWrite", 0);
-            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-            material.SetColor("_BaseColor", Color.white);
-        }
-
-        Materials[rippleStyle] = material;
-        return material;
+        Mesh mesh = new Mesh();
+        mesh.name = "HexagonRing";
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateBounds();
+        return mesh;
     }
 }
