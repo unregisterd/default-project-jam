@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 
 public static class RespawnSetup
@@ -14,17 +14,12 @@ public static class RespawnSetup
             return;
         }
 
-        if (player.GetComponent<CheckpointTracker>() == null)
-        {
-            player.AddComponent<CheckpointTracker>();
-        }
-
         if (player.GetComponent<PlayerRespawnManager>() == null)
         {
             player.AddComponent<PlayerRespawnManager>();
         }
 
-        Debug.Log("[Respawn] 已给 Player 添加 CheckpointTracker + PlayerRespawnManager。"
+        Debug.Log("[Respawn] 已给 Player 添加 PlayerRespawnManager。"
                   + " 记得确认 HintCanvas 上有 FadePanel，且 PlayerBlockAgent 的 Auto Fall Respawn 未勾选。");
     }
 }

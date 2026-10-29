@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class ScreenFader : MonoBehaviour
@@ -21,6 +21,13 @@ public class ScreenFader : MonoBehaviour
         }
     }
 
+    public void SetAlpha(float alpha)
+    {
+        if (group != null)
+        {
+            group.alpha = Mathf.Clamp01(alpha);
+        }
+    }
     public IEnumerator Fade(float target, float duration)
     {
         if (group == null)

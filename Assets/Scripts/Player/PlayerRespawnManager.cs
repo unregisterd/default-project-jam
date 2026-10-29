@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerRespawnManager : MonoBehaviour
 {
@@ -8,8 +9,6 @@ public class PlayerRespawnManager : MonoBehaviour
     [SerializeField] private FirstPersonMotor motor;
     [SerializeField] private PlayerLook look;
     [SerializeField] private PlayerBlockAgent agent;
-    [SerializeField] private AbilityWallet wallet;
-    [SerializeField] private CheckpointTracker checkpoint;
     [SerializeField] private Hud_StarEnergy hud;
 
     [Header("死亡判定")]
@@ -19,19 +18,25 @@ public class PlayerRespawnManager : MonoBehaviour
     [Tooltip("绝对地板，低于它就判死")]
     [SerializeField] private float worldFloorY = -50f;
 
-    [Header("演出")]
+    [Header("死亡演出")]
     [SerializeField] private float fadeOutDuration = 0.8f;
     [SerializeField] private float holdDuration = 1.5f;
-    [SerializeField] private float fadeInDuration = 0.8f;
     [SerializeField] private AudioClip deathClip;
     [Range(0f, 1f)]
     [SerializeField] private float deathVolume = 0.8f;
 
-    private bool _dead;
+    [Header("开场演出")]
+    [SerializeField] private bool playIntro = true;
+    [SerializeField] private float openingHold = 2.5f;
+    [SerializeField] private float narrationHold = 4.5f;
+    [SerializeField] private float hintHold = 2.5f;
+    [SerializeField] private float introFadeIn = 1.2f;
+
+    private bool _busy;
     private AudioSource _audio;
     private EndingDirector _ending;
 
-    public bool IsDead => _dead;
+    public bool IsBusy => _busy;
 
     private void Awake()
     {
@@ -39,8 +44,6 @@ public class PlayerRespawnManager : MonoBehaviour
         if (motor == null) motor = GetComponent<FirstPersonMotor>();
         if (look == null) look = GetComponent<PlayerLook>();
         if (agent == null) agent = GetComponent<PlayerBlockAgent>();
-        if (wallet == null) wallet = GetComponent<AbilityWallet>();
-        if (checkpoint == null) checkpoint = GetComponent<CheckpointTracker>();
         if (hud == null) hud = GetComponent<Hud_StarEnergy>();
         _ending = FindObjectOfType<EndingDirector>();
 
@@ -54,9 +57,17 @@ public class PlayerRespawnManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (playIntro)
+        {
+            StartCoroutine(IntroRoutine());
+        }
+    }
+
     private void Update()
     {
-        if (_dead || (checkpoint != null && !checkpoint.HasCheckpoint))
+        if (_busy)
         {
             return;
         }
@@ -68,19 +79,19 @@ public class PlayerRespawnManager : MonoBehaviour
 
         if (input != null && input.ResetPressed)
         {
-            Die();
+            StartCoroutine(DeathRoutine());
             return;
         }
 
         if (transform.position.y < worldFloorY)
         {
-            Die();
+            StartCoroutine(DeathRoutine());
             return;
         }
 
         if (agent != null && !agent.IsGrounded && !HasBlockBelow())
         {
-            Die();
+            StartCoroutine(DeathRoutine());
         }
     }
 
@@ -96,22 +107,52 @@ public class PlayerRespawnManager : MonoBehaviour
         return false;
     }
 
-    public void Die()
+    private IEnumerator IntroRoutine()
     {
-        if (_dead)
+        _busy = true;
+        SetControlEnabled(false);
+
+        if (hud != null) hud.SetVisible(false);
+
+        if (ScreenFader.Instance != null)
         {
-            return;
+            ScreenFader.Instance.SetAlpha(1f);
         }
 
-        _dead = true;
-        StartCoroutine(DeathRoutine());
+        ShowLine("intro_opening", 2f);
+        yield return new WaitForSeconds(openingHold);
+
+        ShowLine("intro_narration", 2f);
+        yield return new WaitForSeconds(narrationHold);
+
+        ShowLine("intro_hint", 2f);
+        yield return new WaitForSeconds(hintHold);
+
+        if (UITextManager.Instance != null)
+        {
+            UITextManager.Instance.HideText();
+        }
+
+        if (ScreenFader.Instance != null)
+        {
+            yield return ScreenFader.Instance.Fade(0f, introFadeIn);
+        }
+
+        if (hud != null) hud.SetVisible(true);
+        SetControlEnabled(true);
+        _busy = false;
     }
 
     private IEnumerator DeathRoutine()
     {
-        if (motor != null) motor.enabled = false;
-        if (look != null) look.enabled = false;
-        if (agent != null) agent.enabled = false;
+        if (_busy)
+        {
+            yield break;
+        }
+
+        _busy = true;
+        SetControlEnabled(false);
+
         if (hud != null) hud.SetVisible(false);
 
         if (deathClip != null && _audio != null)
@@ -126,74 +167,43 @@ public class PlayerRespawnManager : MonoBehaviour
 
         if (UITextManager.Instance != null)
         {
-            string fade = Loc.Text("death_fade");
-            string back = Loc.Text("death_return");
-            UITextManager.Instance.ShowText($"{fade}\n{back}", 0f, true);
+            string line = $"{Loc.Text("death_fade")}\n{Loc.Text("death_return")}";
+            UITextManager.Instance.ShowText(line, 0f, true);
         }
 
         yield return new WaitForSeconds(holdDuration);
 
-        Restore();
+        Scene scene = SceneManager.GetActiveScene();
 
-        if (ScreenFader.Instance != null)
+        if (scene.buildIndex >= 0)
         {
-            yield return ScreenFader.Instance.Fade(0f, fadeInDuration);
+            SceneManager.LoadScene(scene.buildIndex);
         }
-
-        if (UITextManager.Instance != null)
+        else
         {
-            UITextManager.Instance.HideText();
+            Debug.LogError("[Respawn] 当前场景不在 Build Settings 里，无法重开。请把 Main.unity 加入构建设置。");
+            _busy = false;
         }
-
-        if (hud != null) hud.SetVisible(true);
-        if (motor != null) motor.enabled = true;
-        if (look != null) look.enabled = true;
-        if (agent != null) agent.enabled = true;
-
-        _dead = false;
     }
 
-    private void Restore()
+    private void ShowLine(string id, float typeSpeed)
     {
-        if (checkpoint == null)
+        if (UITextManager.Instance == null)
         {
             return;
         }
 
-        if (motor != null)
-        {
-            motor.Teleport(checkpoint.Position);
-        }
-        else
-        {
-            transform.position = checkpoint.Position;
-        }
+        string speaker = Loc.Speaker(id);
+        string text = Loc.Text(id);
+        string content = string.IsNullOrEmpty(speaker) ? text : $"{speaker}\n{text}";
 
-        transform.rotation = checkpoint.Rotation;
+        UITextManager.Instance.ShowText(content, 0f, true);
+    }
 
-        if (look != null)
-        {
-            look.ResetPitch();
-        }
-
-        if (wallet == null)
-        {
-            wallet = GetComponent<AbilityWallet>();
-        }
-
-        if (wallet != null)
-        {
-            wallet.SetPoints(checkpoint.Points);
-        }
-
-        checkpoint.RestoreNpcs();
-
-        if (agent != null)
-        {
-            agent.enabled = true;
-            agent.NotifyExternalMove();
-        }
-
-        Debug.Log($"[Respawn] 回到检查点，点数 {checkpoint.Points}");
+    private void SetControlEnabled(bool enabled)
+    {
+        if (motor != null) motor.enabled = enabled;
+        if (look != null) look.enabled = enabled;
+        if (agent != null) agent.enabled = enabled;
     }
 }
