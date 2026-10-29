@@ -31,6 +31,7 @@ public class NpcSymbol : MonoBehaviour
     private RippleEmitter _ripple;
     private bool _inRange;
     private bool _claimed;
+    private int _remainingPoints = -1;
     private float _nextRetryTime;
     private string _promptLine = string.Empty;
 
@@ -125,21 +126,42 @@ public class NpcSymbol : MonoBehaviour
             return;
         }
 
+        if (_remainingPoints < 0)
+        {
+            _remainingPoints = points;
+        }
+
         int free = _wallet.MaxPoints - _wallet.Points;
 
-        if (free < points)
+        if (free <= 0)
         {
-            _promptLine = Loc.Language == "en" ? "Star Energy is full." : "星光已满，先用掉一些吧";
-            ShowText();
+            SetPrompt(Loc.Language == "en" ? "Star Energy is full." : "星光已满，先用掉一些吧");
             return;
         }
 
-        _wallet.Add(points);
-        _claimed = true;
-        _promptLine = Loc.Language == "en" ? $"+{points} Star Energy" : $"+{points} 点星光";
-        ShowText();
+        int give = Mathf.Min(free, _remainingPoints);
+        int accepted = _wallet.Add(give);
+        _remainingPoints -= accepted;
 
-        Debug.Log($"[NPC] 领取 {ability} +{points}（当前 {_wallet.Points}/{_wallet.MaxPoints}）");
+        if (_remainingPoints <= 0)
+        {
+            _claimed = true;
+        }
+
+        SetPrompt(Loc.Language == "en" ? $"+{accepted} Star Energy" : $"+{accepted} 点星光");
+
+        Debug.Log($"[NPC] {ability} 领取 {accepted} 点（剩余 {_remainingPoints}，当前 {_wallet.Points}/{_wallet.MaxPoints}）");
+    }
+
+    private void SetPrompt(string line)
+    {
+        if (_promptLine == line)
+        {
+            return;
+        }
+
+        _promptLine = line;
+        ShowText();
     }
 
     private void ShowText()
