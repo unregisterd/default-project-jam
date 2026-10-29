@@ -28,6 +28,7 @@ public class PlayerRespawnManager : MonoBehaviour
     [SerializeField] private bool playIntro = true;
     [SerializeField] private float openingHold = 2.5f;
     [SerializeField] private float narrationHold = 4.5f;
+    [SerializeField] private float narration2Hold = 3.5f;
     [SerializeField] private float hintHold = 2.5f;
     [SerializeField] private float introFadeIn = 1.2f;
 
@@ -121,6 +122,11 @@ public class PlayerRespawnManager : MonoBehaviour
 
         if (hud != null) hud.SetVisible(false);
 
+        if (UITextManager.Instance != null)
+        {
+            UITextManager.Instance.SetControlsVisible(false);
+        }
+
         if (ScreenFader.Instance != null)
         {
             ScreenFader.Instance.SetAlpha(1f);
@@ -131,6 +137,9 @@ public class PlayerRespawnManager : MonoBehaviour
 
         ShowLine("intro_narration");
         yield return new WaitForSeconds(narrationHold);
+
+        ShowLine("intro_narration_2");
+        yield return new WaitForSeconds(narration2Hold);
 
         ShowLine("intro_hint");
         yield return new WaitForSeconds(hintHold);
@@ -143,6 +152,11 @@ public class PlayerRespawnManager : MonoBehaviour
         if (ScreenFader.Instance != null)
         {
             yield return ScreenFader.Instance.Fade(0f, introFadeIn);
+        }
+
+        if (UITextManager.Instance != null)
+        {
+            UITextManager.Instance.SetControlsVisible(true);
         }
 
         if (hud != null) hud.SetVisible(true);
@@ -162,6 +176,11 @@ public class PlayerRespawnManager : MonoBehaviour
 
         _busy = true;
         SetControlEnabled(false);
+
+        if (UITextManager.Instance != null)
+        {
+            UITextManager.Instance.SetControlsVisible(false);
+        }
 
         if (hud != null) hud.SetVisible(false);
 

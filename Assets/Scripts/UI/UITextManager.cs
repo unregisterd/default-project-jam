@@ -59,6 +59,13 @@ public class UITextManager : MonoBehaviour
         _routine = StartCoroutine(TypeRoutine(content, holdSeconds, sticky));
     }
 
+    public void SetControlsVisible(bool visible)
+    {
+        if (controlsText != null)
+        {
+            controlsText.gameObject.SetActive(visible);
+        }
+    }
     public void ShowCenter(string content, float holdSeconds = 0f, bool sticky = true)
     {
         if (centerText == null)
