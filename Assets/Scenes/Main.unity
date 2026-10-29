@@ -1776,7 +1776,6 @@ GameObject:
   - component: {fileID: 238314292}
   - component: {fileID: 238314293}
   - component: {fileID: 238314294}
-  - component: {fileID: 238314296}
   - component: {fileID: 238314295}
   m_Layer: 0
   m_Name: Player
@@ -1897,7 +1896,7 @@ Transform:
   m_GameObject: {fileID: 238314282}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 3.732, y: 0.25, z: -6.566}
+  m_LocalPosition: {x: 3.732, y: 0.23, z: -6.566}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1983,8 +1982,6 @@ MonoBehaviour:
   motor: {fileID: 0}
   look: {fileID: 0}
   agent: {fileID: 0}
-  wallet: {fileID: 0}
-  checkpoint: {fileID: 0}
   hud: {fileID: 0}
   blockProbeLength: 80
   groundMask:
@@ -1993,24 +1990,13 @@ MonoBehaviour:
   worldFloorY: -50
   fadeOutDuration: 0.8
   holdDuration: 1.5
-  fadeInDuration: 0.8
   deathClip: {fileID: 0}
   deathVolume: 0.8
---- !u!114 &238314296
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 238314282}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1dd018c01aa1d7e4db5b45262ff73878, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  agent: {fileID: 0}
-  wallet: {fileID: 0}
-  entryRange: 2.5
+  playIntro: 1
+  openingHold: 2.5
+  narrationHold: 4.5
+  hintHold: 2.5
+  introFadeIn: 1.2
 --- !u!1 &244590196
 GameObject:
   m_ObjectHideFlags: 0

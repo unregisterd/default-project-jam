@@ -12,9 +12,8 @@ public class PlayerRespawnManager : MonoBehaviour
     [SerializeField] private Hud_StarEnergy hud;
 
     [Header("死亡判定")]
-    [Tooltip("向下探测方块的距离，没命中就判死")]
-    [SerializeField] private float blockProbeLength = 80f;
-    [SerializeField] private LayerMask groundMask = ~0;
+    [Tooltip("比最近一次站稳的高度低多少米才判死（15~25）")]
+    [SerializeField] private float fallDeathDistance = 20f;
     [Tooltip("绝对地板，低于它就判死")]
     [SerializeField] private float worldFloorY = -50f;
 
@@ -35,7 +34,7 @@ public class PlayerRespawnManager : MonoBehaviour
     private bool _busy;
     private bool _hasBeenGrounded;
     private float _controlEnabledAt;
-    private float _spawnGrace = 3f;
+    private float _lastSafeY;
     private AudioSource _audio;
     private EndingDirector _ending;
 
@@ -58,6 +57,8 @@ public class PlayerRespawnManager : MonoBehaviour
             _audio.playOnAwake = false;
             _audio.spatialBlend = 0f;
         }
+
+        _lastSafeY = transform.position.y;
     }
 
     private void Start()
@@ -88,40 +89,29 @@ public class PlayerRespawnManager : MonoBehaviour
             return;
         }
 
-        if (transform.position.y < worldFloorY)
+        if (agent != null && agent.IsGrounded)
         {
-            StartCoroutine(DeathRoutine());
+            _lastSafeY = transform.position.y;
+            _hasBeenGrounded = true;
             return;
         }
 
-        if (agent != null && agent.IsGrounded)
+        bool fellTooFar = transform.position.y < _lastSafeY - fallDeathDistance;
+        bool belowFloor = transform.position.y < worldFloorY;
+
+        if (!fellTooFar && !belowFloor)
         {
-            _hasBeenGrounded = true;
+            return;
         }
 
-        if (agent != null && !agent.IsGrounded && !HasBlockBelow() && Time.time - _controlEnabledAt > _spawnGrace)
+        if (!_hasBeenGrounded && Time.time - _controlEnabledAt < 5f)
         {
-            if (!_hasBeenGrounded && Time.time - _controlEnabledAt < _spawnGrace * 3f)
-            {
-                Debug.LogError("[Respawn] 出生点下方没有任何方块，玩家一直在下落。请检查 Player 与出生台的坐标。");
-                _busy = true;
-                return;
-            }
-
-            StartCoroutine(DeathRoutine());
-        }
-    }
-
-    private bool HasBlockBelow()
-    {
-        Vector3 origin = transform.position + Vector3.up * 0.2f;
-
-        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, blockProbeLength, groundMask, QueryTriggerInteraction.Ignore))
-        {
-            return hit.collider.GetComponentInParent<Block>() != null;
+            Debug.LogError("[Respawn] 出生点下方没有落脚点，玩家一直在下落。请检查 Player 与出生台的坐标。");
+            _busy = true;
+            return;
         }
 
-        return false;
+        StartCoroutine(DeathRoutine());
     }
 
     private IEnumerator IntroRoutine()
@@ -136,13 +126,13 @@ public class PlayerRespawnManager : MonoBehaviour
             ScreenFader.Instance.SetAlpha(1f);
         }
 
-        ShowLine("intro_opening", 2f);
+        ShowLine("intro_opening");
         yield return new WaitForSeconds(openingHold);
 
-        ShowLine("intro_narration", 2f);
+        ShowLine("intro_narration");
         yield return new WaitForSeconds(narrationHold);
 
-        ShowLine("intro_hint", 2f);
+        ShowLine("intro_hint");
         yield return new WaitForSeconds(hintHold);
 
         if (UITextManager.Instance != null)
@@ -159,6 +149,7 @@ public class PlayerRespawnManager : MonoBehaviour
         SetControlEnabled(true);
         _controlEnabledAt = Time.time;
         _hasBeenGrounded = false;
+        _lastSafeY = transform.position.y;
         _busy = false;
     }
 
@@ -200,12 +191,12 @@ public class PlayerRespawnManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[Respawn] 当前场景不在 Build Settings 里，无法重开。请把 Main.unity 加入构建设置。");
+            Debug.LogError("[Respawn] 当前场景不在 Build Settings 里，无法重开。");
             _busy = false;
         }
     }
 
-    private void ShowLine(string id, float typeSpeed)
+    private void ShowLine(string id)
     {
         if (UITextManager.Instance == null)
         {
