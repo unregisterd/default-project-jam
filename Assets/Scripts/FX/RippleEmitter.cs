@@ -5,17 +5,16 @@ using UnityEngine;
 public class RippleEmitter : MonoBehaviour
 {
     [SerializeField] private int poolSize = 4;
-    [SerializeField] private float startScale = 0.6f;
+    [SerializeField] private float startScale = 0.7f;
     [SerializeField] private float endScale = 3.2f;
-    [SerializeField] private float duration = 1.2f;
-    [SerializeField] private float startAlpha = 0.75f;
+    [SerializeField] private float duration = 1.1f;
+    [SerializeField] private float startAlpha = 0.85f;
     [SerializeField] private float heightOffset = 0.03f;
     [SerializeField] private bool loop;
     [SerializeField] private float loopInterval = 1.6f;
     [SerializeField] private bool randomRotation = true;
 
     private static Material _sharedMaterial;
-    private static Mesh _ringMesh;
 
     private readonly List<Ripple> _pool = new List<Ripple>();
     private float _nextLoopTime;
@@ -40,22 +39,32 @@ public class RippleEmitter : MonoBehaviour
 
     private void Awake()
     {
-        EnsureResources();
+        Material material = GetMaterial();
 
         for (int i = 0; i < Mathf.Max(1, poolSize); i++)
         {
-            GameObject ring = new GameObject("RippleRing");
+            GameObject ring = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            ring.name = "RippleRing";
             ring.transform.SetParent(transform, false);
+            ring.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             ring.transform.localPosition = new Vector3(0f, heightOffset, 0f);
             ring.transform.localScale = Vector3.zero;
 
-            MeshFilter filter = ring.AddComponent<MeshFilter>();
-            filter.sharedMesh = _ringMesh;
+            Collider collider = ring.GetComponent<Collider>();
 
-            MeshRenderer renderer = ring.AddComponent<MeshRenderer>();
-            renderer.sharedMaterial = _sharedMaterial;
-            renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            renderer.receiveShadows = false;
+            if (collider != null)
+            {
+                Destroy(collider);
+            }
+
+            Renderer renderer = ring.GetComponent<Renderer>();
+
+            if (renderer != null)
+            {
+                renderer.sharedMaterial = material;
+                renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+            }
 
             _pool.Add(new Ripple
             {
@@ -79,9 +88,7 @@ public class RippleEmitter : MonoBehaviour
             PlayOnce();
         }
 
-        Color moodColor = SkyMoodController.Instance != null
-            ? SkyMoodController.Instance.RippleColor
-            : new Color(1f, 0.86f, 0.8f);
+        float blend = SkyMoodController.Instance != null ? SkyMoodController.Instance.Blend : 0f;
 
         for (int i = 0; i < _pool.Count; i++)
         {
@@ -106,15 +113,14 @@ public class RippleEmitter : MonoBehaviour
             float scale = Mathf.Lerp(startScale, endScale, eased);
             float alpha = Mathf.Lerp(startAlpha, 0f, progress * progress);
 
-            ripple.Transform.localScale = new Vector3(scale, scale, scale);
+            ripple.Transform.localScale = new Vector3(scale, scale, 1f);
 
             Renderer renderer = ripple.Transform.GetComponent<Renderer>();
 
             if (renderer != null)
             {
-                Color color = moodColor;
-                color.a = alpha;
-                ripple.Property.SetColor("_BaseColor", color);
+                ripple.Property.SetFloat("_Blend", blend);
+                ripple.Property.SetColor("_Color", new Color(1f, 1f, 1f, alpha));
                 renderer.SetPropertyBlock(ripple.Property);
             }
 
@@ -135,75 +141,37 @@ public class RippleEmitter : MonoBehaviour
 
             if (randomRotation)
             {
-                ripple.Transform.localRotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+                ripple.Transform.localRotation = Quaternion.Euler(90f, Random.Range(0f, 360f), 0f);
             }
 
             _pool[i] = ripple;
         }
     }
 
-    private static void EnsureResources()
+    private static Material GetMaterial()
     {
-        if (_ringMesh == null)
-        {
-            _ringMesh = BuildHexagonRing();
-        }
-
         if (_sharedMaterial != null)
         {
-            return;
+            return _sharedMaterial;
         }
 
-        Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
-        _sharedMaterial = new Material(shader);
-        _sharedMaterial.SetFloat("_Surface", 1f);
-        _sharedMaterial.SetFloat("_Blend", 0f);
-        _sharedMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-        _sharedMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
-        _sharedMaterial.SetInt("_ZWrite", 0);
-        _sharedMaterial.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-        _sharedMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-        _sharedMaterial.SetColor("_BaseColor", Color.white);
-    }
+        Shader shader = Shader.Find("FX/RippleBlend");
 
-    private static Mesh BuildHexagonRing()
-    {
-        const int sides = 6;
-        float inner = 1f - 0.12f;
-
-        List<Vector3> vertices = new List<Vector3>();
-        List<int> triangles = new List<int>();
-
-        for (int i = 0; i < sides; i++)
+        if (shader == null)
         {
-            float a0 = (i / (float)sides) * Mathf.PI * 2f;
-            float a1 = ((i + 1) / (float)sides) * Mathf.PI * 2f;
-
-            Vector3 inner0 = new Vector3(Mathf.Cos(a0), 0f, Mathf.Sin(a0)) * inner;
-            Vector3 outer0 = new Vector3(Mathf.Cos(a0), 0f, Mathf.Sin(a0));
-            Vector3 inner1 = new Vector3(Mathf.Cos(a1), 0f, Mathf.Sin(a1)) * inner;
-            Vector3 outer1 = new Vector3(Mathf.Cos(a1), 0f, Mathf.Sin(a1));
-
-            int start = vertices.Count;
-            vertices.Add(inner0);
-            vertices.Add(outer0);
-            vertices.Add(inner1);
-            vertices.Add(outer1);
-
-            triangles.Add(start);
-            triangles.Add(start + 2);
-            triangles.Add(start + 1);
-
-            triangles.Add(start + 1);
-            triangles.Add(start + 2);
-            triangles.Add(start + 3);
+            Debug.LogWarning("[Ripple] 找不到 FX/RippleBlend shader");
+            shader = Shader.Find("Universal Render Pipeline/Unlit");
         }
 
-        Mesh mesh = new Mesh();
-        mesh.name = "HexagonRing";
-        mesh.SetVertices(vertices);
-        mesh.SetTriangles(triangles, 0);
-        mesh.RecalculateBounds();
-        return mesh;
+        _sharedMaterial = new Material(shader);
+        _sharedMaterial.SetColor("_Color", Color.white);
+
+        Texture2D warm = Resources.Load<Texture2D>("FX/T_HaloWarm");
+        Texture2D cool = Resources.Load<Texture2D>("FX/T_HaloCool");
+
+        if (warm != null) _sharedMaterial.SetTexture("_MainTex", warm);
+        if (cool != null) _sharedMaterial.SetTexture("_SecondTex", cool);
+
+        return _sharedMaterial;
     }
 }
