@@ -39,6 +39,66 @@ public static class RippleSetup
 
         Debug.Log("[Ripple] 已把水墨圈贴图应用到 M_Ripple（加法混合，白墨发光）");
     }
+    [MenuItem("Tools/FX/Build Crystal Ripple Materials")]
+    public static void BuildCrystalRippleMaterials()
+    {
+        BuildCrystalMaterial("T_RipplePlayer.png", "M_RipplePlayer");
+        BuildCrystalMaterial("T_RippleNpc.png", "M_RippleNpc");
+        AssetDatabase.SaveAssets();
+        Debug.Log("[Ripple] 已生成 M_RipplePlayer / M_RippleNpc（Alpha 混合）");
+    }
+
+    private static void BuildCrystalMaterial(string textureName, string materialName)
+    {
+        string texturePath = $"{ResourceFolder}/{textureName}";
+        Texture2D texture = AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
+
+        if (texture == null)
+        {
+            Debug.LogError($"[Ripple] 找不到 {texturePath}");
+            return;
+        }
+
+        TextureImporter importer = AssetImporter.GetAtPath(texturePath) as TextureImporter;
+
+        if (importer != null)
+        {
+            importer.textureType = TextureImporterType.Default;
+            importer.alphaIsTransparency = true;
+            importer.wrapMode = TextureWrapMode.Clamp;
+            importer.mipmapEnabled = true;
+            importer.SaveAndReimport();
+        }
+
+        string path = $"{ResourceFolder}/{materialName}.mat";
+        Material material = AssetDatabase.LoadAssetAtPath<Material>(path);
+        Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+
+        if (material == null)
+        {
+            material = new Material(shader);
+            AssetDatabase.CreateAsset(material, path);
+        }
+        else
+        {
+            material.shader = shader;
+        }
+
+        material.SetTexture("_BaseMap", texture);
+        material.SetTexture("_MainTex", texture);
+        material.SetColor("_BaseColor", Color.white);
+        material.SetFloat("_Surface", 1f);
+        material.SetFloat("_Blend", 0f);
+        material.SetFloat("_ZWrite", 0f);
+        material.SetFloat("_AlphaClip", 0f);
+        material.SetOverrideTag("RenderType", "Transparent");
+        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+        material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+        material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+        material.enableInstancing = true;
+        EditorUtility.SetDirty(material);
+    }
     [MenuItem("Tools/FX/Setup Ripple")]
     public static void Setup()
     {

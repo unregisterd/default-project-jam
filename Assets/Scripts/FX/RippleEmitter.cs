@@ -1,10 +1,18 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+public enum RippleStyle
+{
+    Ink = 0,
+    CrystalPlayer = 1,
+    CrystalNpc = 2,
+}
+
 [DisallowMultipleComponent]
 public class RippleEmitter : MonoBehaviour
 {
     [SerializeField] private int poolSize = 4;
+    [SerializeField] private RippleStyle style = RippleStyle.Ink;
     [SerializeField] private float startScale = 0.6f;
     [SerializeField] private float endScale = 3.2f;
     [SerializeField] private float duration = 1.6f;
@@ -14,7 +22,7 @@ public class RippleEmitter : MonoBehaviour
     [SerializeField] private float loopInterval = 0.9f;
     [SerializeField] private bool randomRotation = true;
 
-    private static Material _sharedMaterial;
+    private static readonly Dictionary<RippleStyle, Material> Materials = new Dictionary<RippleStyle, Material>();
 
     private readonly List<Ripple> _pool = new List<Ripple>();
     private float _nextLoopTime;
@@ -27,7 +35,7 @@ public class RippleEmitter : MonoBehaviour
         public bool Active;
     }
 
-    public void Configure(bool loopRings, float interval, float ringDuration, float scaleStart, float scaleEnd, float alpha)
+    public void Configure(bool loopRings, float interval, float ringDuration, float scaleStart, float scaleEnd, float alpha, RippleStyle rippleStyle)
     {
         loop = loopRings;
         loopInterval = Mathf.Max(0.1f, interval);
@@ -35,11 +43,17 @@ public class RippleEmitter : MonoBehaviour
         startScale = scaleStart;
         endScale = scaleEnd;
         startAlpha = alpha;
+        style = rippleStyle;
+    }
+
+    public void Configure(bool loopRings, float interval, float ringDuration, float scaleStart, float scaleEnd, float alpha)
+    {
+        Configure(loopRings, interval, ringDuration, scaleStart, scaleEnd, alpha, style);
     }
 
     private void Awake()
     {
-        Material material = GetMaterial();
+        Material material = GetMaterial(style);
 
         for (int i = 0; i < Mathf.Max(1, poolSize); i++)
         {
@@ -145,29 +159,51 @@ public class RippleEmitter : MonoBehaviour
         }
     }
 
-    private static Material GetMaterial()
+    private static Material GetMaterial(RippleStyle rippleStyle)
     {
-        if (_sharedMaterial != null)
+        if (Materials.TryGetValue(rippleStyle, out Material cached) && cached != null)
         {
-            return _sharedMaterial;
+            return cached;
         }
 
-        _sharedMaterial = Resources.Load<Material>("FX/M_Ripple");
+        string path;
 
-        if (_sharedMaterial == null)
+        switch (rippleStyle)
+        {
+            case RippleStyle.CrystalPlayer:
+                path = "FX/M_RipplePlayer";
+                break;
+            case RippleStyle.CrystalNpc:
+                path = "FX/M_RippleNpc";
+                break;
+            default:
+                path = "FX/M_Ripple";
+                break;
+        }
+
+        Material material = Resources.Load<Material>(path);
+
+        if (material == null)
+        {
+            Debug.LogWarning($"[Ripple] 找不到 Resources/{path}，回退到 M_Ripple");
+            material = Resources.Load<Material>("FX/M_Ripple");
+        }
+
+        if (material == null)
         {
             Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
-            _sharedMaterial = new Material(shader);
-            _sharedMaterial.SetFloat("_Surface", 1f);
-            _sharedMaterial.SetFloat("_Blend", 0f);
-            _sharedMaterial.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-            _sharedMaterial.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
-            _sharedMaterial.SetInt("_ZWrite", 0);
-            _sharedMaterial.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-            _sharedMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-            _sharedMaterial.SetColor("_BaseColor", Color.white);
+            material = new Material(shader);
+            material.SetFloat("_Surface", 1f);
+            material.SetFloat("_Blend", 0f);
+            material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.One);
+            material.SetInt("_ZWrite", 0);
+            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            material.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            material.SetColor("_BaseColor", Color.white);
         }
 
-        return _sharedMaterial;
+        Materials[rippleStyle] = material;
+        return material;
     }
 }
