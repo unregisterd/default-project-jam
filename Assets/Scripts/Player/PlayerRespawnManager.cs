@@ -33,6 +33,9 @@ public class PlayerRespawnManager : MonoBehaviour
     [SerializeField] private float introFadeIn = 1.2f;
 
     private bool _busy;
+    private bool _hasBeenGrounded;
+    private float _controlEnabledAt;
+    private float _spawnGrace = 3f;
     private AudioSource _audio;
     private EndingDirector _ending;
 
@@ -59,6 +62,8 @@ public class PlayerRespawnManager : MonoBehaviour
 
     private void Start()
     {
+        _controlEnabledAt = Time.time;
+
         if (playIntro)
         {
             StartCoroutine(IntroRoutine());
@@ -89,8 +94,20 @@ public class PlayerRespawnManager : MonoBehaviour
             return;
         }
 
-        if (agent != null && !agent.IsGrounded && !HasBlockBelow())
+        if (agent != null && agent.IsGrounded)
         {
+            _hasBeenGrounded = true;
+        }
+
+        if (agent != null && !agent.IsGrounded && !HasBlockBelow() && Time.time - _controlEnabledAt > _spawnGrace)
+        {
+            if (!_hasBeenGrounded && Time.time - _controlEnabledAt < _spawnGrace * 3f)
+            {
+                Debug.LogError("[Respawn] 出生点下方没有任何方块，玩家一直在下落。请检查 Player 与出生台的坐标。");
+                _busy = true;
+                return;
+            }
+
             StartCoroutine(DeathRoutine());
         }
     }
@@ -140,6 +157,8 @@ public class PlayerRespawnManager : MonoBehaviour
 
         if (hud != null) hud.SetVisible(true);
         SetControlEnabled(true);
+        _controlEnabledAt = Time.time;
+        _hasBeenGrounded = false;
         _busy = false;
     }
 
