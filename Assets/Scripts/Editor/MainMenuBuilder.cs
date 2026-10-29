@@ -304,6 +304,7 @@ public static class MainMenuBuilder
         velocity.space = ParticleSystemSimulationSpace.World;
         velocity.x = new ParticleSystem.MinMaxCurve(-0.06f, 0.06f);
         velocity.y = new ParticleSystem.MinMaxCurve(-0.02f, 0.03f);
+        velocity.z = new ParticleSystem.MinMaxCurve(-0.01f, 0.01f);
 
         ParticleSystem.ColorOverLifetimeModule fade = particles.colorOverLifetime;
         fade.enabled = true;
