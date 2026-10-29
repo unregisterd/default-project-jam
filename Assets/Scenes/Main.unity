@@ -1806,7 +1806,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 238314289}
-  maxPoints: 6
+  maxPoints: 4
   startPoints: 0
   cooldown: 0.6
   courageHeight: 3.3
@@ -1884,7 +1884,7 @@ MonoBehaviour:
   narrationHold: 4.5
   narration2Hold: 3.5
   hintHold: 2.5
-  introFadeIn: 1.2
+  introFadeIn: 1.67
 --- !u!21 &240860227
 Material:
   serializedVersion: 8
