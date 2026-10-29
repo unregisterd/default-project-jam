@@ -21,12 +21,12 @@
       "id": "intro_narration",
       "type": "narration",
       "speaker": {
-        "zh": "旁白",
-        "en": "Narrator"
+        "zh": "",
+        "en": ""
       },
       "text": {
-        "zh": "传说，在世界的最高处，有一颗永不熄灭的星星，世人都想寻找到它。小骑士，系紧行囊，你该出发了。",
-        "en": "It is said that at the top of the world burns a star that never goes out. Everyone wants to find it. Little knight, tighten your pack. It is time to go."
+        "zh": "传说，在世界的最高处，有一颗永不熄灭的星星，世人都想寻找到它。\n小骑士，系紧行囊，你该出发了。",
+        "en": "It is said that at the top of the world burns a star that never goes out. Everyone wants to find it.\nLittle knight, tighten your pack. It is time to go."
       },
       "note": ""
     },
