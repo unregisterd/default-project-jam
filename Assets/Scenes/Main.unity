@@ -1882,6 +1882,7 @@ MonoBehaviour:
   playIntro: 1
   openingHold: 3.71
   narrationHold: 4.5
+  narration2Hold: 3.5
   hintHold: 2.5
   introFadeIn: 1.2
 --- !u!21 &240860227
@@ -3908,6 +3909,74 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 668e21f47ca6dac44976fb885888d206, type: 3}
+--- !u!1 &475006146
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 475006148}
+  - component: {fileID: 475006147}
+  m_Layer: 0
+  m_Name: Environment
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &475006147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 475006146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daad2b3a7b08f124ca34ab53995a66dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  duskTop: {r: 0.42, g: 0.34, b: 0.58, a: 1}
+  duskHorizon: {r: 1, g: 0.79, b: 0.64, a: 1}
+  duskGround: {r: 0.22, g: 0.18, b: 0.26, a: 1}
+  duskFog: {r: 0.96, g: 0.8, b: 0.72, a: 1}
+  duskAmbient: {r: 0.62, g: 0.55, b: 0.62, a: 1}
+  nightTop: {r: 0.08, g: 0.1, b: 0.28, a: 1}
+  nightHorizon: {r: 0.12, g: 0.62, b: 0.78, a: 1}
+  nightGround: {r: 0.03, g: 0.04, b: 0.1, a: 1}
+  nightFog: {r: 0.07, g: 0.1, b: 0.24, a: 1}
+  nightAmbient: {r: 0.18, g: 0.22, b: 0.38, a: 1}
+  duskRipple: {r: 1, g: 0.86, b: 0.8, a: 1}
+  nightRipple: {r: 0.55, g: 0.95, b: 1, a: 1}
+  duskBackdrop: {fileID: 2800000, guid: 7aaaae007bb63b64486cc1657ab8267c, type: 3}
+  nightBackdrop: {fileID: 2800000, guid: 1905ee6935a75fd409a49b5041ba46ac, type: 3}
+  backdropDistance: 60
+  backdropPadding: 1.12
+  duskBgm: {fileID: 8300000, guid: 66c79c1d236e58442ab3109796391ffb, type: 3}
+  nightBgm: {fileID: 8300000, guid: f4125dbcaf4d0b14b9f64fc878f689f4, type: 3}
+  bgmVolume: 0.55
+  blendDuration: 8
+  nightAnchorName: Tower_Extension
+  nightHeightFallback: 45
+  fogEndDusk: 60
+  fogEndNight: 95
+--- !u!4 &475006148
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 475006146}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &479125063 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
@@ -28942,3 +29011,4 @@ SceneRoots:
   - {fileID: 330691428}
   - {fileID: 15328821}
   - {fileID: 1548835578}
+  - {fileID: 475006148}
