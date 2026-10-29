@@ -8,10 +8,12 @@ public class UITextManager : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI hintText;
     [SerializeField] private TextMeshProUGUI controlsText;
+    [SerializeField] private TextMeshProUGUI centerText;
     [SerializeField] private float typeInterval = 0.035f;
     [SerializeField] private float fadeDuration = 0.35f;
 
     private Coroutine _routine;
+    private Coroutine _centerRoutine;
 
     private void Awake()
     {
@@ -21,6 +23,12 @@ public class UITextManager : MonoBehaviour
         {
             hintText.text = string.Empty;
             SetAlpha(hintText, 0f);
+        }
+
+        if (centerText != null)
+        {
+            centerText.text = string.Empty;
+            SetAlpha(centerText, 0f);
         }
 
         RefreshControls();
@@ -51,6 +59,65 @@ public class UITextManager : MonoBehaviour
         _routine = StartCoroutine(TypeRoutine(content, holdSeconds, sticky));
     }
 
+    public void ShowCenter(string content, float holdSeconds = 0f, bool sticky = true)
+    {
+        if (centerText == null)
+        {
+            ShowText(content, holdSeconds, sticky);
+            return;
+        }
+
+        if (_centerRoutine != null)
+        {
+            StopCoroutine(_centerRoutine);
+        }
+
+        _centerRoutine = StartCoroutine(CenterRoutine(content, holdSeconds, sticky));
+    }
+
+    public void HideCenter()
+    {
+        if (centerText == null)
+        {
+            HideText();
+            return;
+        }
+
+        if (_centerRoutine != null)
+        {
+            StopCoroutine(_centerRoutine);
+            _centerRoutine = null;
+        }
+
+        StartCoroutine(FadeRoutine(centerText, centerText.color.a, 0f));
+        centerText.text = string.Empty;
+    }
+
+    private IEnumerator CenterRoutine(string content, float holdSeconds, bool sticky)
+    {
+        centerText.text = content;
+        centerText.maxVisibleCharacters = 0;
+        SetAlpha(centerText, 0f);
+
+        yield return FadeRoutine(centerText, 0f, 1f);
+
+        for (int i = 0; i <= content.Length; i++)
+        {
+            centerText.maxVisibleCharacters = i;
+            yield return new WaitForSeconds(typeInterval);
+        }
+
+        if (sticky)
+        {
+            _centerRoutine = null;
+            yield break;
+        }
+
+        yield return new WaitForSeconds(holdSeconds);
+        yield return FadeRoutine(centerText, 1f, 0f);
+        centerText.text = string.Empty;
+        _centerRoutine = null;
+    }
     public void HideText()
     {
         if (hintText == null)

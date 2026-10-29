@@ -137,7 +137,7 @@ public class PlayerRespawnManager : MonoBehaviour
 
         if (UITextManager.Instance != null)
         {
-            UITextManager.Instance.HideText();
+            UITextManager.Instance.HideCenter();
         }
 
         if (ScreenFader.Instance != null)
@@ -178,7 +178,7 @@ public class PlayerRespawnManager : MonoBehaviour
         if (UITextManager.Instance != null)
         {
             string line = $"{Loc.Text("death_fade")}\n{Loc.Text("death_return")}";
-            UITextManager.Instance.ShowText(line, 0f, true);
+            UITextManager.Instance.ShowCenter(line, 0f, true);
         }
 
         yield return new WaitForSeconds(holdDuration);
@@ -207,7 +207,7 @@ public class PlayerRespawnManager : MonoBehaviour
         string text = Loc.Text(id);
         string content = string.IsNullOrEmpty(speaker) ? text : $"{speaker}\n{text}";
 
-        UITextManager.Instance.ShowText(content, 0f, true);
+        UITextManager.Instance.ShowCenter(content, 0f, true);
     }
 
     private void SetControlEnabled(bool enabled)

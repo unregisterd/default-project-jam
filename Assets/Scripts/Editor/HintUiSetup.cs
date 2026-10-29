@@ -59,6 +59,16 @@ public static class HintUiSetup
             TextAlignmentOptions.Left,
             ControlsColor);
 
+        TextMeshProUGUI center = CreateText(
+            canvasObject.transform,
+            "CenterText",
+            font,
+            new Vector2(0.5f, 0.5f),
+            Vector2.zero,
+            new Vector2(1500f, 420f),
+            42f,
+            TextAlignmentOptions.Center,
+            HintColor);
         GameObject fadeObject = new GameObject("FadePanel", typeof(RectTransform), typeof(Image), typeof(CanvasGroup));
         fadeObject.transform.SetParent(canvasObject.transform, false);
         fadeObject.transform.SetAsFirstSibling();
@@ -87,6 +97,7 @@ public static class HintUiSetup
         SerializedObject serialized = new SerializedObject(manager);
         serialized.FindProperty("hintText").objectReferenceValue = hint;
         serialized.FindProperty("controlsText").objectReferenceValue = controls;
+        serialized.FindProperty("centerText").objectReferenceValue = center;
         serialized.ApplyModifiedPropertiesWithoutUndo();
 
         Selection.activeGameObject = canvasObject;
