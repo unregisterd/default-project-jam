@@ -1,4 +1,4 @@
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -59,6 +59,29 @@ public static class HintUiSetup
             TextAlignmentOptions.Left,
             ControlsColor);
 
+        GameObject fadeObject = new GameObject("FadePanel", typeof(RectTransform), typeof(Image), typeof(CanvasGroup));
+        fadeObject.transform.SetParent(canvasObject.transform, false);
+        fadeObject.transform.SetAsFirstSibling();
+
+        RectTransform fadeRect = fadeObject.GetComponent<RectTransform>();
+        fadeRect.anchorMin = Vector2.zero;
+        fadeRect.anchorMax = Vector2.one;
+        fadeRect.offsetMin = Vector2.zero;
+        fadeRect.offsetMax = Vector2.zero;
+
+        Image fadeImage = fadeObject.GetComponent<Image>();
+        fadeImage.color = Color.black;
+        fadeImage.raycastTarget = false;
+
+        CanvasGroup fadeGroup = fadeObject.GetComponent<CanvasGroup>();
+        fadeGroup.alpha = 0f;
+        fadeGroup.blocksRaycasts = false;
+        fadeGroup.interactable = false;
+
+        ScreenFader fader = canvasObject.AddComponent<ScreenFader>();
+        SerializedObject faderSerialized = new SerializedObject(fader);
+        faderSerialized.FindProperty("group").objectReferenceValue = fadeGroup;
+        faderSerialized.ApplyModifiedPropertiesWithoutUndo();
         UITextManager manager = canvasObject.AddComponent<UITextManager>();
 
         SerializedObject serialized = new SerializedObject(manager);

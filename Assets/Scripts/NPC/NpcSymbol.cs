@@ -35,6 +35,8 @@ public class NpcSymbol : MonoBehaviour
     private float _nextRetryTime;
     private string _promptLine = string.Empty;
 
+    public bool HasGivenPoints { get; private set; }
+
     private void Awake()
     {
         _wallet = walletOverride != null ? walletOverride : FindObjectOfType<AbilityWallet>();
@@ -140,6 +142,11 @@ public class NpcSymbol : MonoBehaviour
         }
 
         int give = Mathf.Min(free, _remainingPoints);
+
+        if (give > 0)
+        {
+            HasGivenPoints = true;
+        }
         int accepted = _wallet.Add(give);
         _remainingPoints -= accepted;
 
@@ -153,6 +160,12 @@ public class NpcSymbol : MonoBehaviour
         Debug.Log($"[NPC] {ability} 领取 {accepted} 点（剩余 {_remainingPoints}，当前 {_wallet.Points}/{_wallet.MaxPoints}）");
     }
 
+    public void ResetClaim()
+    {
+        _claimed = false;
+        _remainingPoints = points;
+        HasGivenPoints = false;
+    }
     private void SetPrompt(string line)
     {
         if (_promptLine == line)

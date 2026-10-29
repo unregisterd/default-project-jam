@@ -17,6 +17,7 @@ public class PlayerInputReader : MonoBehaviour
     public bool Ability2Pressed { get; private set; }
     public bool Ability3Pressed { get; private set; }
     public bool Ability4Pressed { get; private set; }
+    public bool ResetPressed { get; private set; }
     public bool IsReady => _ready;
 
     private InputActionMap _map;
@@ -29,6 +30,7 @@ public class PlayerInputReader : MonoBehaviour
     private InputAction _ability2Action;
     private InputAction _ability3Action;
     private InputAction _ability4Action;
+    private InputAction _resetAction;
     private bool _ready;
 
     private void Awake()
@@ -56,6 +58,7 @@ public class PlayerInputReader : MonoBehaviour
         _ability2Action = _map.FindAction("Ability2", false);
         _ability3Action = _map.FindAction("Ability3", false);
         _ability4Action = _map.FindAction("Ability4", false);
+        _resetAction = _map.FindAction("Reset", false);
 
         if (_moveAction == null || _lookAction == null)
         {
@@ -98,6 +101,7 @@ public class PlayerInputReader : MonoBehaviour
         Ability2Pressed = _ability2Action != null && _ability2Action.WasPressedThisFrame();
         Ability3Pressed = _ability3Action != null && _ability3Action.WasPressedThisFrame();
         Ability4Pressed = _ability4Action != null && _ability4Action.WasPressedThisFrame();
+        ResetPressed = _resetAction != null && _resetAction.WasPressedThisFrame();
     }
 
     public void SetActions(InputActionAsset asset)

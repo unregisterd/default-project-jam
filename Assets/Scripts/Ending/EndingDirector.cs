@@ -47,6 +47,8 @@ public class EndingDirector : MonoBehaviour
     private bool _originalFogEnabled;
     private Coroutine _routine;
 
+    public bool IsPlaying => _routine != null;
+
     private void Awake()
     {
         if (viewCamera == null)

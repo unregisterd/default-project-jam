@@ -263,6 +263,32 @@
         "en": "It is said that at the top of the world burns a star that never goes out."
       },
       "note": "回到起点，循环"
+    },
+    {
+      "id": "death_fade",
+      "type": "narration",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "星光黯淡了……",
+        "en": "The starlight fades…"
+      },
+      "note": "死亡黑屏"
+    },
+    {
+      "id": "death_return",
+      "type": "narration",
+      "speaker": {
+        "zh": "",
+        "en": ""
+      },
+      "text": {
+        "zh": "风将你带回了曾经走过的路。",
+        "en": "The wind carries you back to the path you walked."
+      },
+      "note": "重生提示"
     }
   ]
 }

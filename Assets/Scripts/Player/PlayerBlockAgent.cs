@@ -9,6 +9,8 @@ public class PlayerBlockAgent : MonoBehaviour
     [SerializeField] private LayerMask groundMask = ~0;
     [Tooltip("从脚底向下探测方块的距离")]
     [SerializeField] private float groundProbeDistance = 0.35f;
+    [Tooltip("是否启用就近回退（调试用）；正式流程由 PlayerRespawnManager 接管")]
+    [SerializeField] private bool autoFallRespawn;
     [Tooltip("掉到低于最后站立方块多少米就回退（推荐 3~5）")]
     [SerializeField] private float fallDepth = 3.5f;
     [Tooltip("绝对兜底高度（找不到最后方块时使用）")]
@@ -39,6 +41,8 @@ public class PlayerBlockAgent : MonoBehaviour
     private bool _wasGrounded = true;
 
     public Block StandingBlock => _standingBlock;
+
+    public bool IsGrounded => _controller != null && _controller.isGrounded;
 
     public event Action<Block> StandingBlockChanged;
 
@@ -142,6 +146,11 @@ public class PlayerBlockAgent : MonoBehaviour
 
     private bool ShouldRespawn()
     {
+        if (!autoFallRespawn)
+        {
+            return transform.position.y < fallRespawnY;
+        }
+
         if (_lastStandingBlock != null && _lastStandingBlock.gameObject.activeInHierarchy)
         {
             return transform.position.y < _lastStandingTop - fallDepth;

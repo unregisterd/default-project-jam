@@ -78,6 +78,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Reset",
+                    "type": "Button",
+                    "id": "b1a2c3d4-0000-4000-8000-00000000000b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Ability4",
                     "type": "Button",
                     "id": "b1a2c3d4-0000-4000-8000-00000000000a",
@@ -217,6 +226,17 @@
                     "processors": "",
                     "groups": "KeyboardMouse",
                     "action": "Ability3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b1a2c3d4-0000-4000-8000-00000000001d",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardMouse",
+                    "action": "Reset",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

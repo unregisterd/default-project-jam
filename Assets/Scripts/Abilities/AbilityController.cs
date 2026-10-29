@@ -7,7 +7,7 @@ public class AbilityController : MonoBehaviour
     [SerializeField] private PlayerInputReader input;
 
     [Header("星光池")]
-    [SerializeField] private int maxPoints = 4;
+    [SerializeField] private int maxPoints = 6;
     [SerializeField] private int startPoints;
     [Tooltip("每个技能的全局冷却")]
     [SerializeField] private float cooldown = 0.6f;

@@ -73,6 +73,16 @@ public class PlayerLook : MonoBehaviour
         SetCursorLocked(!_cursorLocked);
     }
 
+    public void ResetPitch()
+    {
+        _pitch = 0f;
+
+        if (cameraPivot != null)
+        {
+            cameraPivot.localRotation = Quaternion.identity;
+        }
+    }
+
     public void SetCursorLocked(bool locked)
     {
         _cursorLocked = locked;

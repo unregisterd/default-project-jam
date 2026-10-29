@@ -30,6 +30,7 @@ public class Hud_StarEnergy : MonoBehaviour
     [SerializeField] private float padding = 14f;
 
     private GUIStyle _style;
+    private bool _visible = true;
     private Texture2D _starTexture;
     private static Hud_StarEnergy _active;
 
@@ -78,8 +79,18 @@ public class Hud_StarEnergy : MonoBehaviour
         }
     }
 
+    public void SetVisible(bool visible)
+    {
+        _visible = visible;
+    }
+
     private void OnGUI()
     {
+        if (!_visible)
+        {
+            return;
+        }
+
         if (wallet == null)
         {
             wallet = FindObjectOfType<AbilityWallet>();
