@@ -46,6 +46,14 @@ namespace StarterAssets
         [Tooltip("Time required to pass before entering the fall state. Useful for walking down stairs")]
         public float FallTimeout = 0.15f;
 
+        // [CUSTOM] 手感增强：土狼时间与跳跃缓冲
+        [Header("Feel (Custom)")]
+        [Tooltip("离开平台边缘后仍可起跳的宽容时间（秒）")]
+        public float CoyoteTime = 0.12f;
+
+        [Tooltip("落地前提前按跳，落地瞬间自动起跳的缓冲时间（秒）")]
+        public float JumpBuffer = 0.12f;
+
         [Header("Player Grounded")]
         [Tooltip("If the character is grounded or not. Not part of the CharacterController built in grounded check")]
         public bool Grounded = true;
@@ -90,6 +98,11 @@ namespace StarterAssets
         // timeout deltatime
         private float _jumpTimeoutDelta;
         private float _fallTimeoutDelta;
+
+        // [CUSTOM] 土狼时间 / 跳跃缓冲状态
+        private float _lastGroundedTime = -999f;
+        private float _jumpBufferTime = -999f;
+        private bool _coyoteUsed;
 
         // animation IDs
         private int _animIDSpeed;
@@ -150,6 +163,9 @@ namespace StarterAssets
             // reset our timeouts on start
             _jumpTimeoutDelta = JumpTimeout;
             _fallTimeoutDelta = FallTimeout;
+
+            // [CUSTOM] 初始化土狼时间基准
+            _lastGroundedTime = Time.time;
         }
 
         private void Update()
@@ -281,8 +297,24 @@ namespace StarterAssets
 
         private void JumpAndGravity()
         {
+            // [CUSTOM] 记录“跳跃键按下”的时刻，用于落地缓冲
+            if (_input.jump)
+            {
+                _jumpBufferTime = Time.time;
+            }
+
+            // [CUSTOM] 冷却改为每帧递减（原版只在落地时递减，落地后要等 0.5s 才能跳）
+            if (_jumpTimeoutDelta >= 0.0f)
+            {
+                _jumpTimeoutDelta -= Time.deltaTime;
+            }
+
             if (Grounded)
             {
+                // [CUSTOM] 记录最后一次站在地上的时间，并重置土狼时间
+                _lastGroundedTime = Time.time;
+                _coyoteUsed = false;
+
                 // reset the fall timeout timer
                 _fallTimeoutDelta = FallTimeout;
 
@@ -298,31 +330,9 @@ namespace StarterAssets
                 {
                     _verticalVelocity = -2f;
                 }
-
-                // Jump
-                if (_input.jump && _jumpTimeoutDelta <= 0.0f)
-                {
-                    // the square root of H * -2 * G = how much velocity needed to reach desired height
-                    _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
-
-                    // update animator if using character
-                    if (_hasAnimator)
-                    {
-                        _animator.SetBool(_animIDJump, true);
-                    }
-                }
-
-                // jump timeout
-                if (_jumpTimeoutDelta >= 0.0f)
-                {
-                    _jumpTimeoutDelta -= Time.deltaTime;
-                }
             }
             else
             {
-                // reset the jump timeout timer
-                _jumpTimeoutDelta = JumpTimeout;
-
                 // fall timeout
                 if (_fallTimeoutDelta >= 0.0f)
                 {
@@ -339,6 +349,26 @@ namespace StarterAssets
 
                 // if we are not grounded, do not jump
                 _input.jump = false;
+            }
+
+            // [CUSTOM] 统一的起跳判定：地面 / 土狼时间 + 跳跃缓冲
+            bool canCoyote = !_coyoteUsed && (Time.time - _lastGroundedTime) <= CoyoteTime;
+            bool hasBuffered = (Time.time - _jumpBufferTime) <= JumpBuffer;
+
+            if (canCoyote && hasBuffered && _jumpTimeoutDelta <= 0.0f && _verticalVelocity <= 0.5f)
+            {
+                // the square root of H * -2 * G = how much velocity needed to reach desired height
+                _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+
+                // update animator if using character
+                if (_hasAnimator)
+                {
+                    _animator.SetBool(_animIDJump, true);
+                }
+
+                _jumpTimeoutDelta = JumpTimeout;
+                _jumpBufferTime = -999f;
+                _coyoteUsed = true;
             }
 
             // apply gravity over time if under terminal (multiply by delta time twice to linearly speed up over time)
