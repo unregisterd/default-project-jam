@@ -274,14 +274,15 @@ public class PlayerBlockAgent : MonoBehaviour
         }
 
         float expectedCenterY = controller.height * 0.5f;
-        bool offCenter = Mathf.Abs(controller.center.x) > 0.001f
-                         || Mathf.Abs(controller.center.z) > 0.001f
-                         || Mathf.Abs(controller.center.y - expectedCenterY) > 0.01f;
+        bool offCenter = Mathf.Abs(controller.center.x) > 0.02f
+                         || Mathf.Abs(controller.center.z) > 0.02f
+                         || Mathf.Abs(controller.center.y - expectedCenterY) > 0.12f;
 
         if (offCenter)
         {
             Debug.LogWarning(
-                $"[PlayerBlockAgent] CharacterController 的 center 应为 (0, {expectedCenterY:0.##}, 0)，当前 {controller.center}。",
+                $"[PlayerBlockAgent] CharacterController 的 center 与胶囊高度不匹配（期望 y≈{expectedCenterY:0.##}，当前 {controller.center}），"
+                + "脚底探测与落地判定可能偏。ThirdPerson 预制体自带 0.93 属于正常范围。",
                 this);
         }
     }

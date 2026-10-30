@@ -83,11 +83,6 @@ public class ThirdPersonMotorAdapter : MonoBehaviour, IMotor
         float gravity = _gravityField != null ? (float)_gravityField.GetValue(_controller) : -15f;
         float safeHeight = Mathf.Max(0.05f, height);
         _verticalVelocityField.SetValue(_controller, Mathf.Sqrt(2f * safeHeight * Mathf.Abs(gravity)));
-
-        if (forwardSpeed > 0f)
-        {
-            Debug.Log("[MotorAdapter] 第三人称控制器无法注入前冲速度，本次只做垂直起跳。", this);
-        }
     }
 
     public void Teleport(Vector3 position)

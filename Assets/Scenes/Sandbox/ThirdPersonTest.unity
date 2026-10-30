@@ -1704,7 +1704,23 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1842726558}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1842726557}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1842726556}
+    - targetCorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1842726555}
   m_SourcePrefab: {fileID: 100100000, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
 --- !u!4 &1842726553 stripped
 Transform:
@@ -1712,6 +1728,96 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1842726552}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1842726554 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4416926081852918481, guid: 64dce48905ffd9b4293e595fa6941544,
+    type: 3}
+  m_PrefabInstance: {fileID: 1842726552}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1842726555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842726554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83bb02c31cbbced46b896827211df6f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  input: {fileID: 0}
+  maxPoints: 6
+  startPoints: 6
+  cooldown: 0.6
+  courageHeight: 3.3
+  courageForwardSpeed: 2
+  patienceRiseHeight: 2
+  patienceDuration: 1
+  hopePlatformPrefab: {fileID: 0}
+  hopePlatformType: {fileID: 0}
+  hopeForwardDistance: 2.5
+  hopeUpOffset: 0.8
+  hopeLifetime: 10
+  hopeBlinkTime: 2
+  wisdomRadius: 12
+  palette: {fileID: 0}
+  showDebugHud: 1
+  useHitStop: 1
+  hitStopDuration: 0.05
+  hitStopScale: 0.05
+--- !u!114 &1842726556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842726554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e4475432504bfd45aad15e7b29629d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  actions: {fileID: -944628639613478452, guid: 840fb5939ff95544098ed773848b1445, type: 3}
+  actionMapName: Player
+--- !u!114 &1842726557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842726554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73c38c783c0634f4da89802369cdce7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  motorSource: {fileID: 0}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  groundProbeDistance: 0.35
+  autoFallRespawn: 0
+  fallDepth: 3.5
+  fallRespawnY: -12
+  landingClip: {fileID: 0}
+  landingVolume: 0.7
+  stepClip: {fileID: 0}
+  stepDistance: 2
+  stepVolume: 0.35
+--- !u!114 &1842726558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1842726554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2993c899d720870439aa5834f2d88fa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  controllerSource: {fileID: 0}
 --- !u!1001 &1884718050
 PrefabInstance:
   m_ObjectHideFlags: 0
