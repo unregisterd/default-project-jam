@@ -11,7 +11,7 @@ public static class LanguageSwitchBuilder
     private const string LeftSprite = "Assets/Resources/UI/T_JoyLeft.png";
     private const string RightSprite = "Assets/Resources/UI/T_JoyRight.png";
 
-    [MenuItem("Tools/Menu/Add Language Switch")]
+    [MenuItem("Tools/Menu/Add Language Toggle")]
     public static void Add()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -35,35 +35,47 @@ public static class LanguageSwitchBuilder
         }
 
         Transform canvas = canvasObject.transform;
-        Transform old = canvas.Find("Language Switch");
 
-        if (old != null)
+        foreach (string name in new[] { "Language Switch", "Language Toggle" })
         {
-            Object.DestroyImmediate(old.gameObject);
+            Transform old = canvas.Find(name);
+
+            if (old != null)
+            {
+                Object.DestroyImmediate(old.gameObject);
+            }
         }
 
         Texture2D left = AssetDatabase.LoadAssetAtPath<Texture2D>(LeftSprite);
         Texture2D right = AssetDatabase.LoadAssetAtPath<Texture2D>(RightSprite);
 
-        GameObject container = new GameObject("Language Switch", typeof(RectTransform));
-        RectTransform containerRect = container.GetComponent<RectTransform>();
-        containerRect.SetParent(canvas, false);
-        containerRect.anchorMin = new Vector2(1f, 0f);
-        containerRect.anchorMax = new Vector2(1f, 0f);
-        containerRect.pivot = new Vector2(1f, 0f);
-        containerRect.anchoredPosition = new Vector2(-120f, 70f);
-        containerRect.sizeDelta = new Vector2(140f, 56f);
+        GameObject go = new GameObject("Language Toggle", typeof(RectTransform));
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.SetParent(canvas, false);
+        rect.anchorMin = new Vector2(1f, 0f);
+        rect.anchorMax = new Vector2(1f, 0f);
+        rect.pivot = new Vector2(1f, 0f);
+        rect.anchoredPosition = new Vector2(-90f, 70f);
+        rect.sizeDelta = new Vector2(64f, 64f);
 
-        Button zhButton = CreateButton(containerRect, "Lang ZH", left, new Vector2(-74f, 0f));
-        Button enButton = CreateButton(containerRect, "Lang EN", right, new Vector2(0f, 0f));
+        RawImage icon = go.AddComponent<RawImage>();
+        icon.texture = Loc.Language == "en" ? right : left;
+        icon.color = new Color(1f, 0.95f, 0.88f, 0.8f);
+        icon.raycastTarget = true;
+
+        Button button = go.AddComponent<Button>();
+        button.targetGraphic = icon;
+        button.transition = Selectable.Transition.None;
 
         MainMenuManager manager = canvasObject.GetComponent<MainMenuManager>();
 
         if (manager != null)
         {
             SerializedObject so = new SerializedObject(manager);
-            so.FindProperty("languageZhButton").objectReferenceValue = zhButton;
-            so.FindProperty("languageEnButton").objectReferenceValue = enButton;
+            so.FindProperty("languageToggleButton").objectReferenceValue = button;
+            so.FindProperty("languageToggleIcon").objectReferenceValue = icon;
+            so.FindProperty("languageEnIcon").objectReferenceValue = right;
+            so.FindProperty("languageZhIcon").objectReferenceValue = left;
 
             TMP_Text title = FindText("Title");
             TMP_Text subtitle = FindText("Subtitle");
@@ -80,32 +92,9 @@ public static class LanguageSwitchBuilder
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene, ScenePath);
-        Selection.activeGameObject = container;
+        Selection.activeGameObject = go;
 
-        Debug.Log("[Language] 主菜单右下角已加语言切换：◀ 中文 / ▶ English。选择会通过 PlayerPrefs 记住。");
-    }
-
-    private static Button CreateButton(RectTransform parent, string name, Texture2D icon, Vector2 position)
-    {
-        GameObject go = new GameObject(name, typeof(RectTransform));
-        RectTransform rect = go.GetComponent<RectTransform>();
-        rect.SetParent(parent, false);
-        rect.anchorMin = new Vector2(1f, 0.5f);
-        rect.anchorMax = new Vector2(1f, 0.5f);
-        rect.pivot = new Vector2(1f, 0.5f);
-        rect.sizeDelta = new Vector2(56f, 56f);
-        rect.anchoredPosition = position;
-
-        RawImage image = go.AddComponent<RawImage>();
-        image.texture = icon;
-        image.color = new Color(1f, 0.95f, 0.88f, 0.75f);
-        image.raycastTarget = true;
-
-        Button button = go.AddComponent<Button>();
-        button.targetGraphic = image;
-        button.transition = Selectable.Transition.None;
-
-        return button;
+        Debug.Log("[Language] 主菜单右下角已加语言开关：默认 ▶（English），点击翻转为 ◀（中文），再点翻回。选择会记住。");
     }
 
     private static TMP_Text FindText(string name, string parentName = null)

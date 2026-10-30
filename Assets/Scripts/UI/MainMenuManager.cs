@@ -41,8 +41,10 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private TMP_Text subtitleLabel;
     [SerializeField] private TMP_Text startLabel;
     [SerializeField] private TMP_Text quitLabel;
-    [SerializeField] private Button languageZhButton;
-    [SerializeField] private Button languageEnButton;
+    [SerializeField] private Button languageToggleButton;
+    [SerializeField] private RawImage languageToggleIcon;
+    [SerializeField] private Texture2D languageEnIcon;
+    [SerializeField] private Texture2D languageZhIcon;
 
     private AudioSource _bgmSource;
     private AudioSource _sfxSource;
@@ -167,17 +169,16 @@ public class MainMenuManager : MonoBehaviour
             AddHover(quitButton);
         }
 
-        if (languageZhButton != null)
+        if (languageToggleButton != null)
         {
-            languageZhButton.onClick.AddListener(() => Loc.SetLanguage("zh"));
-            AddHover(languageZhButton);
+            languageToggleButton.onClick.AddListener(ToggleLanguage);
+            AddHover(languageToggleButton);
         }
+    }
 
-        if (languageEnButton != null)
-        {
-            languageEnButton.onClick.AddListener(() => Loc.SetLanguage("en"));
-            AddHover(languageEnButton);
-        }
+    private void ToggleLanguage()
+    {
+        Loc.SetLanguage(Loc.Language == "en" ? "zh" : "en");
     }
 
     private void RefreshLocalized()
@@ -186,6 +187,16 @@ public class MainMenuManager : MonoBehaviour
         if (subtitleLabel != null) subtitleLabel.text = Loc.Language == "en" ? string.Empty : "CHASING THE STAR";
         if (startLabel != null) startLabel.text = Loc.Text("menu_start");
         if (quitLabel != null) quitLabel.text = Loc.Text("menu_quit");
+
+        if (languageToggleIcon != null)
+        {
+            Texture2D icon = Loc.Language == "en" ? languageEnIcon : languageZhIcon;
+
+            if (icon != null)
+            {
+                languageToggleIcon.texture = icon;
+            }
+        }
     }
 
     private void OnDestroy()
