@@ -90,8 +90,15 @@ public class SkyMoodController : MonoBehaviour
 
         if (_hasNightAnchor && _player != null && _player.transform.position.y >= _nightHeight)
         {
+            if (Target < 1f)
+            {
+                Debug.Log("[Mood] 到达夜色高度，开始黄昏→深夜过渡");
+            }
+
             Target = 1f;
         }
+
+        UpdateBgm(Time.deltaTime);
 
         if (Mathf.Approximately(Blend, Target))
         {
@@ -129,6 +136,8 @@ public class SkyMoodController : MonoBehaviour
         if (anchor == null)
         {
             _nightHeight = nightHeightFallback;
+            _hasNightAnchor = true;
+            Debug.LogWarning($"[Mood] 场景里没有 {nightAnchorName}，改用兜底高度 {nightHeightFallback}m 触发夜色。");
             return;
         }
 

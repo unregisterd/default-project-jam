@@ -4735,8 +4735,8 @@ MonoBehaviour:
   duskBgm: {fileID: 8300000, guid: 66c79c1d236e58442ab3109796391ffb, type: 3}
   nightBgm: {fileID: 8300000, guid: f4125dbcaf4d0b14b9f64fc878f689f4, type: 3}
   bgmVolume: 0.55
-  bgmCrossfade: 2.5
-  blendDuration: 8
+  bgmCrossfade: 1.99
+  blendDuration: 7.7
   nightAnchorName: Tower_Extension
   nightHeightFallback: 45
   fogEndDusk: 60
