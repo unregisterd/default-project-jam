@@ -60,6 +60,11 @@ public class PlayerRespawnManager : MonoBehaviour
         }
 
         _lastSafeY = transform.position.y;
+
+        if (deathClip == null)
+        {
+            deathClip = Resources.Load<AudioClip>("Audio/SFX/death");
+        }
     }
 
     private void Start()

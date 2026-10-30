@@ -23,12 +23,18 @@ public class NpcSymbol : MonoBehaviour
     [SerializeField] private bool createRipples = true;
 
     [SerializeField] private AbilityWallet walletOverride;
+    [Header("音效")]
+    [Tooltip("留空则从 Resources/Audio/SFX/star_pickup 自动加载")]
+    [SerializeField] private AudioClip pickupClip;
+    [Range(0f, 1f)]
+    [SerializeField] private float pickupVolume = 0.8f;
 
     private AbilityWallet _wallet;
     private float _nextWalletLookup;
     private Transform _player;
     private TextMeshPro _worldText;
     private RippleEmitter _ripple;
+    private AudioSource _audio;
     private bool _inRange;
     private bool _claimed;
     private int _remainingPoints = -1;
@@ -48,6 +54,22 @@ public class NpcSymbol : MonoBehaviour
         }
 
         CreateWorldText();
+
+        _audio = GetComponent<AudioSource>();
+
+        if (_audio == null)
+        {
+            _audio = gameObject.AddComponent<AudioSource>();
+            _audio.playOnAwake = false;
+            _audio.spatialBlend = 0.15f;
+            _audio.rolloffMode = AudioRolloffMode.Linear;
+            _audio.maxDistance = 25f;
+        }
+
+        if (pickupClip == null)
+        {
+            pickupClip = Resources.Load<AudioClip>("Audio/SFX/star_pickup");
+        }
 
         if (createRipples)
         {
@@ -150,6 +172,11 @@ public class NpcSymbol : MonoBehaviour
         int accepted = _wallet.Add(give);
         _remainingPoints -= accepted;
 
+        if (accepted > 0)
+        {
+            PlayPickupSound();
+        }
+
         if (_remainingPoints <= 0)
         {
             _claimed = true;
@@ -158,6 +185,17 @@ public class NpcSymbol : MonoBehaviour
         SetPrompt(Loc.Language == "en" ? $"+{accepted} Star Energy" : $"+{accepted} 点星光");
 
         Debug.Log($"[NPC] {ability} 领取 {accepted} 点（剩余 {_remainingPoints}，当前 {_wallet.Points}/{_wallet.MaxPoints}）");
+    }
+
+    private void PlayPickupSound()
+    {
+        if (_audio == null || pickupClip == null)
+        {
+            return;
+        }
+
+        _audio.pitch = 0.96f + UnityEngine.Random.Range(0f, 0.08f);
+        _audio.PlayOneShot(pickupClip, pickupVolume);
     }
 
     public void ResetClaim()

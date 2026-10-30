@@ -31,6 +31,8 @@ public class SkyMoodController : MonoBehaviour
     [SerializeField] private AudioClip duskBgm;
     [SerializeField] private AudioClip nightBgm;
     [SerializeField] private float bgmVolume = 0.55f;
+    [Tooltip("音乐交叉淡入时长（秒），与视觉过渡解耦，避免两首歌长时间叠加")]
+    [SerializeField] private float bgmCrossfade = 2.5f;
 
     [Header("切换")]
     [SerializeField] private float blendDuration = 8f;
@@ -57,6 +59,7 @@ public class SkyMoodController : MonoBehaviour
     private float _nightHeight;
     private bool _hasNightAnchor;
     private float _lastAppliedBlend = -1f;
+    private float _bgmBlend;
 
     private void Awake()
     {
@@ -98,6 +101,20 @@ public class SkyMoodController : MonoBehaviour
         float speed = blendDuration > 0.01f ? 1f / blendDuration : 1000f;
         Blend = Mathf.MoveTowards(Blend, Target, speed * Time.deltaTime);
         Apply(false);
+    }
+
+    private void UpdateBgm(float dt)
+    {
+        if (_duskSource == null && _nightSource == null)
+        {
+            return;
+        }
+
+        float speed = bgmCrossfade > 0.01f ? 1f / bgmCrossfade : 1000f;
+        _bgmBlend = Mathf.MoveTowards(_bgmBlend, Target, speed * dt);
+
+        if (_duskSource != null) _duskSource.volume = bgmVolume * (1f - _bgmBlend);
+        if (_nightSource != null) _nightSource.volume = bgmVolume * _bgmBlend;
     }
 
     public void SetTarget(float target)
@@ -159,9 +176,6 @@ public class SkyMoodController : MonoBehaviour
         {
             _backdropMaterial.SetFloat("_Blend", Blend);
         }
-
-        if (_duskSource != null) _duskSource.volume = bgmVolume * (1f - Blend);
-        if (_nightSource != null) _nightSource.volume = bgmVolume * Blend;
 
         RenderSettings.skybox = _skyMaterial;
         DynamicGI.UpdateEnvironment();

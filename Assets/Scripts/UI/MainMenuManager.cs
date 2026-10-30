@@ -22,6 +22,7 @@ public class MainMenuManager : MonoBehaviour
     [Header("音频")]
     [SerializeField] private string bgmResource = "Audio/BGM/menu";
     [SerializeField] private string hoverResource = "Audio/UI/hover";
+    [SerializeField] private string clickResource = "Audio/UI/click";
     [SerializeField] private float bgmVolume = 0.5f;
     [SerializeField] private float sfxVolume = 0.7f;
 
@@ -37,6 +38,7 @@ public class MainMenuManager : MonoBehaviour
 
     private AudioSource _bgmSource;
     private AudioSource _sfxSource;
+    private AudioClip _clickClip;
     private bool _leaving;
 
     private void Awake()
@@ -94,6 +96,8 @@ public class MainMenuManager : MonoBehaviour
         _sfxSource.playOnAwake = false;
         _sfxSource.spatialBlend = 0f;
         _sfxSource.volume = sfxVolume;
+
+        _clickClip = Resources.Load<AudioClip>(clickResource);
     }
 
     private void PlayMenuIntro()
@@ -220,6 +224,16 @@ public class MainMenuManager : MonoBehaviour
         }
     }
 
+    private void PlayClickSound()
+    {
+        if (_sfxSource == null || _clickClip == null)
+        {
+            return;
+        }
+
+        _sfxSource.PlayOneShot(_clickClip, sfxVolume);
+    }
+
     public void OnStartButtonClicked()
     {
         if (_leaving)
@@ -228,7 +242,7 @@ public class MainMenuManager : MonoBehaviour
         }
 
         _leaving = true;
-        PlayHoverSound();
+        PlayClickSound();
 
         if (buttonGroup != null)
         {
@@ -274,7 +288,7 @@ public class MainMenuManager : MonoBehaviour
         }
 
         _leaving = true;
-        PlayHoverSound();
+        PlayClickSound();
 
         if (fadeCanvasGroup != null)
         {
