@@ -2,7 +2,7 @@
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerInputReader))]
-public class FirstPersonMotor : MonoBehaviour
+public class FirstPersonMotor : MonoBehaviour, IMotor
 {
     [Header("水平移动")]
     [Tooltip("行走速度（米/秒）")]
@@ -64,6 +64,12 @@ public class FirstPersonMotor : MonoBehaviour
 
 
     public bool IsGrounded => _controller != null && _controller.isGrounded;
+
+    public bool Enabled
+    {
+        get { return enabled; }
+        set { enabled = value; }
+    }
 
     public void Launch(float height, float forwardSpeed)
     {

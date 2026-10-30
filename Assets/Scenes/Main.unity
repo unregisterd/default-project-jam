@@ -1884,8 +1884,8 @@ MonoBehaviour:
   worldFloorY: -50
   fadeOutDuration: 1.43
   holdDuration: 1.81
-  deathClip: {fileID: 0}
-  deathVolume: 0.8
+  deathClip: {fileID: 8300000, guid: 07f187e1d0dc437428c5c0cef74b02f8, type: 3}
+  deathVolume: 0.752
   playIntro: 1
   openingHold: 3.71
   narrationHold: 4.5
@@ -4138,6 +4138,7 @@ MonoBehaviour:
   duskBgm: {fileID: 8300000, guid: 66c79c1d236e58442ab3109796391ffb, type: 3}
   nightBgm: {fileID: 8300000, guid: f4125dbcaf4d0b14b9f64fc878f689f4, type: 3}
   bgmVolume: 0.55
+  bgmCrossfade: 2.5
   blendDuration: 8
   nightAnchorName: Tower_Extension
   nightHeightFallback: 45

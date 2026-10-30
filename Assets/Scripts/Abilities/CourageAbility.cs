@@ -2,7 +2,9 @@
 
 public class CourageAbility : MonoBehaviour, IAbility
 {
-    [SerializeField] private FirstPersonMotor motor;
+    [Tooltip("留空则自动查找同一物体上的 IMotor（第一人称或第三人称适配器）")]
+    [SerializeField] private MonoBehaviour motorSource;
+    private IMotor motor;
     [Tooltip("跳跃高度（米）")]
     [SerializeField] private float jumpHeight = 3.3f;
     [Tooltip("额外水平速度（米/秒）")]
@@ -13,9 +15,11 @@ public class CourageAbility : MonoBehaviour, IAbility
 
     private void Awake()
     {
+        motor = motorSource as IMotor;
+
         if (motor == null)
         {
-            motor = GetComponent<FirstPersonMotor>();
+            motor = GetComponent<IMotor>();
         }
     }
 
@@ -29,7 +33,7 @@ public class CourageAbility : MonoBehaviour, IAbility
     {
         if (motor == null)
         {
-            reason = "缺少 FirstPersonMotor";
+            reason = "缺少 IMotor";
             return false;
         }
 

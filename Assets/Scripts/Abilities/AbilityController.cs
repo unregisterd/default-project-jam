@@ -39,6 +39,14 @@ public class AbilityController : MonoBehaviour
     [Tooltip("自动挂一个临时 HUD，方便看星光数")]
     [SerializeField] private bool showDebugHud = true;
 
+    [Header("顿帧")]
+    [SerializeField] private bool useHitStop = true;
+    [Tooltip("顿帧持续的真实时间（秒）")]
+    [SerializeField] private float hitStopDuration = 0.05f;
+    [Tooltip("顿帧期间的时间缩放，越小越强")]
+    [Range(0.01f, 1f)]
+    [SerializeField] private float hitStopScale = 0.05f;
+
     private AbilityWallet _wallet;
     private CourageAbility _courage;
     private PatienceAbility _patience;
@@ -134,6 +142,12 @@ public class AbilityController : MonoBehaviour
 
         ability.Execute();
         _nextUseTime = Time.time + cooldown;
+
+        if (useHitStop)
+        {
+            HitStop.Play(hitStopDuration, hitStopScale);
+        }
+
         Used?.Invoke(ability.Type);
         return true;
     }

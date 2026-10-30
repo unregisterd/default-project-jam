@@ -4,7 +4,9 @@ using UnityEngine;
 public class PatienceAbility : MonoBehaviour, IAbility
 {
     [SerializeField] private PlayerBlockAgent agent;
-    [SerializeField] private FirstPersonMotor motor;
+    [Tooltip("留空则自动查找同一物体上的 IMotor")]
+    [SerializeField] private MonoBehaviour motorSource;
+    private IMotor motor;
     [SerializeField] private RaisePillarVisual pillarVisual;
     [Tooltip("抬升高度（米）")]
     [SerializeField] private float riseHeight = 2f;
@@ -23,9 +25,10 @@ public class PatienceAbility : MonoBehaviour, IAbility
             agent = GetComponent<PlayerBlockAgent>();
         }
 
+        motor = motorSource as IMotor;
         if (motor == null)
         {
-            motor = GetComponent<FirstPersonMotor>();
+            motor = GetComponent<IMotor>();
         }
 
         if (pillarVisual == null)
@@ -90,7 +93,7 @@ public class PatienceAbility : MonoBehaviour, IAbility
 
         if (motor != null)
         {
-            motor.enabled = false;
+            motor.Enabled = false;
         }
 
         float startY = block.transform.position.y;
@@ -114,7 +117,7 @@ public class PatienceAbility : MonoBehaviour, IAbility
 
         if (motor != null)
         {
-            motor.enabled = true;
+            motor.Enabled = true;
         }
 
         if (agent != null)

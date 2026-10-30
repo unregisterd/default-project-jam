@@ -4,8 +4,9 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerBlockAgent : MonoBehaviour
 {
-    [Tooltip("留空则自动获取")]
-    [SerializeField] private FirstPersonMotor motor;
+    [Tooltip("留空则自动查找同一物体上的 IMotor")]
+    [SerializeField] private MonoBehaviour motorSource;
+    private IMotor _motor;
     [SerializeField] private LayerMask groundMask = ~0;
     [Tooltip("从脚底向下探测方块的距离")]
     [SerializeField] private float groundProbeDistance = 0.35f;
@@ -50,9 +51,10 @@ public class PlayerBlockAgent : MonoBehaviour
     {
         _controller = GetComponent<CharacterController>();
 
-        if (motor == null)
+        _motor = motorSource as IMotor;
+        if (_motor == null)
         {
-            motor = GetComponent<FirstPersonMotor>();
+            _motor = GetComponent<IMotor>();
         }
 
         _lastSafePosition = transform.position;
@@ -183,9 +185,9 @@ public class PlayerBlockAgent : MonoBehaviour
 
     public void RespawnAt(Vector3 position)
     {
-        if (motor != null)
+        if (_motor != null)
         {
-            motor.Teleport(position);
+            _motor.Teleport(position);
         }
         else
         {

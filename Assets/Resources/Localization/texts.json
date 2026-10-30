@@ -129,8 +129,8 @@
         "en": ""
       },
       "text": {
-        "zh": "消耗 1 点星光，点亮半径 12 米内的隐藏方块或道路。",
-        "en": "Spend 1 Star Energy to reveal hidden blocks within 12 meters."
+        "zh": "消耗 1 点星光，点亮半径 11 米内的隐藏方块或道路。",
+        "en": "Spend 1 Star Energy to reveal hidden blocks within 11 meters."
       },
       "note": "能力说明"
     },
