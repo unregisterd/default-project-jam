@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 
 [Serializable]
@@ -34,23 +34,45 @@ public class LocDocument
 public static class Loc
 {
     private const string ResourcePath = "Localization/texts";
+    private const string LanguagePrefsKey = "loc_language";
+    private const string DefaultLanguage = "en";
 
     private static LocDocument _document;
     private static bool _loaded;
 
-    public static string Language = "zh";
+    private static string _language;
+
+    public static string Language
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(_language))
+            {
+                _language = PlayerPrefs.GetString(LanguagePrefsKey, DefaultLanguage);
+            }
+
+            return _language;
+        }
+    }
 
     public static event Action LanguageChanged;
 
     public static void SetLanguage(string language)
     {
-        if (string.IsNullOrEmpty(language) || Language == language)
+        if (string.IsNullOrEmpty(language))
         {
             return;
         }
 
-        Language = language;
-        LanguageChanged?.Invoke();
+        bool changed = Language != language;
+        _language = language;
+        PlayerPrefs.SetString(LanguagePrefsKey, language);
+        PlayerPrefs.Save();
+
+        if (changed)
+        {
+            LanguageChanged?.Invoke();
+        }
     }
 
     public static void ToggleLanguage()

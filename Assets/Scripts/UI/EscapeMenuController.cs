@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -22,8 +22,8 @@ public class EscapeMenuController : MonoBehaviour
     [SerializeField] private Image[] navDiamonds = new Image[4];
 
     [Header("技能图标")]
-    [SerializeField] private Button[] skillButtons = new Button[4];
-    [SerializeField] private Image[] skillDiamonds = new Image[4];
+    [SerializeField] private Button[] skillButtons = new Button[5];
+    [SerializeField] private Image[] skillDiamonds = new Image[5];
 
     [Header("文案")]
     [SerializeField] private string[] skillKeys =
@@ -32,11 +32,30 @@ public class EscapeMenuController : MonoBehaviour
         "ability_wisdom_desc",
         "ability_patience_desc",
         "ability_hope_desc",
+        "skill_shift_desc",
     };
 
-    [SerializeField] private string defaultDetail = "把鼠标移到技能上，看看它能为骑士做什么。\n\n<b>Shift 冲刺</b>　奔跑时速度提升，起跳更远。";
+    [SerializeField] private string[] navKeys =
+    {
+        "esc_resume",
+        "esc_skills",
+        "esc_menu",
+        "esc_quit",
+    };
+
+    [SerializeField] private string[] skillLabelKeys =
+    {
+        "esc_skill_courage",
+        "esc_skill_wisdom",
+        "esc_skill_patience",
+        "esc_skill_hope",
+        "esc_skill_shift",
+    };
+
+    [SerializeField] private string defaultDetail = "把鼠标移到技能上，看看它能为骑士做什么。";
 
     [Header("表现")]
+    [SerializeField] private bool lockCursorOnStart = true;
     [SerializeField] private float fadeDuration = 0.22f;
     [SerializeField] private Color idleColor = new Color(1f, 1f, 1f, 0.8f);
     [SerializeField] private Color hoverColor = new Color(1f, 0.85f, 0.63f, 1f);
@@ -57,6 +76,7 @@ public class EscapeMenuController : MonoBehaviour
     private float _transitionEnd;
     private float _alpha;
     private float _skillsAlpha;
+    private int _currentSkill = -1;
 
     private PlayerInputReader _input;
     private AbilityController _abilities;
@@ -145,6 +165,55 @@ public class EscapeMenuController : MonoBehaviour
         _hud = FindObjectOfType<Hud_StarEnergy>(true);
         _respawn = FindObjectOfType<PlayerRespawnManager>(true);
         _ending = FindObjectOfType<EndingDirector>(true);
+
+        Loc.LanguageChanged += RefreshTexts;
+        RefreshTexts();
+    }
+
+    private void Start()
+    {
+        if (!lockCursorOnStart)
+        {
+            return;
+        }
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+    }
+
+    private void OnDestroy()
+    {
+        Loc.LanguageChanged -= RefreshTexts;
+    }
+
+    private void RefreshTexts()
+    {
+        for (int i = 0; i < _navLabels.Count && i < navKeys.Length; i++)
+        {
+            if (_navLabels[i] != null)
+            {
+                _navLabels[i].text = Loc.Text(navKeys[i]);
+            }
+        }
+
+        for (int i = 0; i < _skillLabels.Count && i < skillLabelKeys.Length; i++)
+        {
+            if (_skillLabels[i] != null)
+            {
+                _skillLabels[i].text = Loc.Text(skillLabelKeys[i]);
+            }
+        }
+
+        defaultDetail = Loc.Text("esc_default");
+
+        if (_currentSkill >= 0)
+        {
+            ShowSkill(_currentSkill);
+        }
+        else
+        {
+            ResetDetail();
+        }
     }
 
     private void Update()
@@ -325,12 +394,14 @@ public class EscapeMenuController : MonoBehaviour
             return;
         }
 
+        _currentSkill = index;
         string text = Loc.Text(skillKeys[index]);
         detailText.text = string.IsNullOrEmpty(text) ? defaultDetail : text;
     }
 
     private void ResetDetail()
     {
+        _currentSkill = -1;
         if (detailText != null)
         {
             detailText.text = defaultDetail;

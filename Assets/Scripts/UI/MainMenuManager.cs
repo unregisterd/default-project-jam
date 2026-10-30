@@ -1,4 +1,4 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -36,6 +36,14 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private Color skyGround = new Color(0.22f, 0.18f, 0.26f);
     [SerializeField] private Color ambientColor = new Color(0.62f, 0.55f, 0.62f);
 
+    [Header("本地化")]
+    [SerializeField] private TMP_Text titleLabel;
+    [SerializeField] private TMP_Text subtitleLabel;
+    [SerializeField] private TMP_Text startLabel;
+    [SerializeField] private TMP_Text quitLabel;
+    [SerializeField] private Button languageZhButton;
+    [SerializeField] private Button languageEnButton;
+
     private AudioSource _bgmSource;
     private AudioSource _sfxSource;
     private AudioClip _clickClip;
@@ -56,6 +64,9 @@ public class MainMenuManager : MonoBehaviour
         BindButtons();
         PlayMenuIntro();
         PlayKnightBreathing();
+
+        Loc.LanguageChanged += RefreshLocalized;
+        RefreshLocalized();
 
         if (_bgmSource != null && _bgmSource.clip != null)
         {
@@ -155,6 +166,31 @@ public class MainMenuManager : MonoBehaviour
             quitButton.onClick.AddListener(OnQuitButtonClicked);
             AddHover(quitButton);
         }
+
+        if (languageZhButton != null)
+        {
+            languageZhButton.onClick.AddListener(() => Loc.SetLanguage("zh"));
+            AddHover(languageZhButton);
+        }
+
+        if (languageEnButton != null)
+        {
+            languageEnButton.onClick.AddListener(() => Loc.SetLanguage("en"));
+            AddHover(languageEnButton);
+        }
+    }
+
+    private void RefreshLocalized()
+    {
+        if (titleLabel != null) titleLabel.text = Loc.Text("menu_title");
+        if (subtitleLabel != null) subtitleLabel.text = Loc.Language == "en" ? string.Empty : "CHASING THE STAR";
+        if (startLabel != null) startLabel.text = Loc.Text("menu_start");
+        if (quitLabel != null) quitLabel.text = Loc.Text("menu_quit");
+    }
+
+    private void OnDestroy()
+    {
+        Loc.LanguageChanged -= RefreshLocalized;
     }
 
     private void AddHover(Button button)

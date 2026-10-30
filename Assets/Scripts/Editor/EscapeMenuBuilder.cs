@@ -82,29 +82,37 @@ public static class EscapeMenuBuilder
 
         RectTransform navRect = CreateContainer(rootRect, "Nav", new Vector2(1f, 0.5f), new Vector2(-150f, 30f), new Vector2(460f, 520f));
 
-        string[] navLabels = { "继续旅途", "技能提示", "返回主菜单", "退出游戏" };
+        string[] navLabels = { Loc.Text("esc_resume"), Loc.Text("esc_skills"), Loc.Text("esc_menu"), Loc.Text("esc_quit") };
         Button[] navButtons = new Button[4];
         Image[] navDiamonds = new Image[4];
 
         for (int i = 0; i < navLabels.Length; i++)
         {
-            navButtons[i] = CreateItem(navRect, navLabels[i], navLabels[i], font, 34f, TextColor,
+            navButtons[i] = CreateItem(navRect, "Nav " + i, navLabels[i], font, 34f, TextColor,
                 new Vector2(0f, 150f - i * 84f), new Vector2(420f, 64f), out navDiamonds[i]);
         }
 
-        RectTransform skillsRect = CreateContainer(rootRect, "Skills", new Vector2(1f, 0.5f), new Vector2(-640f, 30f), new Vector2(290f, 340f));
+        RectTransform skillsRect = CreateContainer(rootRect, "Skills", new Vector2(1f, 0.5f), new Vector2(-640f, 30f), new Vector2(290f, 420f));
         CanvasGroup skillGroup = skillsRect.gameObject.AddComponent<CanvasGroup>();
         skillGroup.alpha = 0f;
         skillGroup.blocksRaycasts = false;
 
-        string[] skillLabels = { "勇气", "智慧", "耐心", "希望" };
-        Button[] skillButtons = new Button[4];
-        Image[] skillDiamonds = new Image[4];
+        string[] skillLabels =
+        {
+            Loc.Text("esc_skill_courage"),
+            Loc.Text("esc_skill_wisdom"),
+            Loc.Text("esc_skill_patience"),
+            Loc.Text("esc_skill_hope"),
+            Loc.Text("esc_skill_shift"),
+        };
+
+        Button[] skillButtons = new Button[5];
+        Image[] skillDiamonds = new Image[5];
 
         for (int i = 0; i < skillLabels.Length; i++)
         {
-            skillButtons[i] = CreateItem(skillsRect, skillLabels[i], skillLabels[i], font, 24f,
-                new Color(1f, 1f, 1f, 0.62f), new Vector2(0f, 120f - i * 80f), new Vector2(290f, 56f),
+            skillButtons[i] = CreateItem(skillsRect, "Skill " + i, skillLabels[i], font, 24f,
+                new Color(1f, 1f, 1f, 0.62f), new Vector2(0f, 150f - i * 72f), new Vector2(290f, 52f),
                 out skillDiamonds[i]);
         }
 
