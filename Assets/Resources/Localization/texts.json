@@ -336,8 +336,8 @@
       "type": "ui",
       "speaker": { "zh": "", "en": "" },
       "text": {
-        "zh": "把鼠标移到技能上，看看它能为骑士做什么。",
-        "en": "Hover a skill to see what it does for the knight."
+        "zh": "想要越过难关，技能必不可少。",
+        "en": "Skills are essential for overcoming challenges."
       },
       "note": "ESC 菜单默认文案"
     },
@@ -381,7 +381,7 @@
       "type": "system",
       "speaker": { "zh": "", "en": "" },
       "text": {
-        "zh": "按住 Shift 冲刺：奔跑速度提升，起跳的距离更远。",
+        "zh": "按住 Shift 冲刺：奔跑速度提升。",
         "en": "Hold Shift to sprint: you run faster and your leap carries farther."
       },
       "note": "技能说明"

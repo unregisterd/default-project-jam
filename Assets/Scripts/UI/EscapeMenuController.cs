@@ -66,9 +66,9 @@ public class EscapeMenuController : MonoBehaviour
     private readonly List<TextMeshProUGUI> _navLabels = new List<TextMeshProUGUI>();
     private readonly List<TextMeshProUGUI> _skillLabels = new List<TextMeshProUGUI>();
     private readonly bool[] _navHoverTarget = new bool[4];
-    private readonly bool[] _skillHoverTarget = new bool[4];
+    private readonly bool[] _skillHoverTarget = new bool[5];
     private readonly float[] _navHover = new float[4];
-    private readonly float[] _skillHover = new float[4];
+    private readonly float[] _skillHover = new float[5];
 
     private bool _open;
     private bool _skillsExpanded;
@@ -135,17 +135,6 @@ public class EscapeMenuController : MonoBehaviour
         {
             skillGroup.alpha = 0f;
             skillGroup.blocksRaycasts = false;
-
-            EventTrigger containerTrigger = skillGroup.GetComponent<EventTrigger>();
-
-            if (containerTrigger == null)
-            {
-                containerTrigger = skillGroup.gameObject.AddComponent<EventTrigger>();
-            }
-
-            EventTrigger.Entry leave = new EventTrigger.Entry { eventID = EventTriggerType.PointerExit };
-            leave.callback.AddListener(_ => CollapseSkills());
-            containerTrigger.triggers.Add(leave);
         }
 
         if (menuGroup != null)
@@ -259,7 +248,12 @@ public class EscapeMenuController : MonoBehaviour
                 color.a = _navHover[i];
                 navDiamonds[i].color = color;
             }
+        }
 
+        int skillCount = Mathf.Min(_skillHover.Length, skillButtons.Length);
+
+        for (int i = 0; i < skillCount; i++)
+        {
             float skillTarget = _open && _skillsExpanded && _skillHoverTarget[i] ? 1f : 0f;
             _skillHover[i] = Mathf.MoveTowards(_skillHover[i], skillTarget, dt * 8f);
 
@@ -318,7 +312,7 @@ public class EscapeMenuController : MonoBehaviour
 
     private void OnHoverEnter(int index, bool isNav)
     {
-        if (index < 0 || index >= 4)
+        if (index < 0 || index >= 5)
         {
             return;
         }
@@ -326,22 +320,16 @@ public class EscapeMenuController : MonoBehaviour
         if (isNav)
         {
             _navHoverTarget[index] = true;
-
-            if (index == 1)
-            {
-                _skillsExpanded = true;
-            }
         }
         else
         {
             _skillHoverTarget[index] = true;
-            ShowSkill(index);
         }
     }
 
     private void OnHoverExit(int index, bool isNav)
     {
-        if (index < 0 || index >= 4)
+        if (index < 0 || index >= 5)
         {
             return;
         }
@@ -353,7 +341,6 @@ public class EscapeMenuController : MonoBehaviour
         else
         {
             _skillHoverTarget[index] = false;
-            ResetDetail();
         }
     }
 
@@ -373,7 +360,7 @@ public class EscapeMenuController : MonoBehaviour
     {
         _skillsExpanded = false;
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < _skillHoverTarget.Length; i++)
         {
             _skillHoverTarget[i] = false;
         }

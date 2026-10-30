@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 [DisallowMultipleComponent]
 public class TimeController : MonoBehaviour
@@ -15,7 +15,15 @@ public class TimeController : MonoBehaviour
     public static void SetPaused(bool paused)
     {
         _paused = paused;
-        EnsureInstance().Apply();
+
+        if (_instance != null)
+        {
+            _instance.Apply();
+        }
+        else
+        {
+            Time.timeScale = paused ? 0f : 1f;
+        }
     }
 
     public static void HitStop(float duration, float scale)
