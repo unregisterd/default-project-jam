@@ -418,6 +418,28 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 515235268}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &586543731 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7776630781381193650, guid: 668e21f47ca6dac44976fb885888d206,
+    type: 3}
+  m_PrefabInstance: {fileID: 1408501456}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &586543732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 586543731}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d01e740cea45517429d9320ae5b5c959, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  renderers: []
+  colliders: []
+  hiddenOnAwake: 1
+  revealDuration: 0.35
 --- !u!1 &646553804
 GameObject:
   m_ObjectHideFlags: 0
@@ -1214,6 +1236,78 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1220719696}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1408501456
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.62720037
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.47
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.2030125
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623176094228217144, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7776630781381193650, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      propertyPath: m_Name
+      value: Block_Art_Blue
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 7776630781381193650, guid: 668e21f47ca6dac44976fb885888d206,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 586543732}
+  m_SourcePrefab: {fileID: 100100000, guid: 668e21f47ca6dac44976fb885888d206, type: 3}
 --- !u!1001 &1574245785
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1673,18 +1767,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
+      propertyPath: CoyoteTime
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
       propertyPath: BottomClamp
       value: -20
       objectReference: {fileID: 0}
     - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: FallTimeout
-      value: 0.11
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: JumpTimeout
-      value: 0.14
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
@@ -1694,12 +1793,12 @@ PrefabInstance:
     - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: SpeedChangeRate
-      value: 13.1
+      value: 16.4
       objectReference: {fileID: 0}
     - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: RotationSmoothTime
-      value: 0.146
+      value: 0.14
       objectReference: {fileID: 0}
     - target: {fileID: 5885216827943657505, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
@@ -1709,9 +1808,10 @@ PrefabInstance:
     - target: {fileID: 5885216827943657505, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: strength
-      value: 0.77
+      value: 3.22
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5885216827943657505, guid: 64dce48905ffd9b4293e595fa6941544, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
@@ -1764,14 +1864,15 @@ MonoBehaviour:
   courageForwardSpeed: 2
   patienceRiseHeight: 2
   patienceDuration: 1
-  hopePlatformPrefab: {fileID: 0}
-  hopePlatformType: {fileID: 0}
+  hopePlatformPrefab: {fileID: 7776630781381193650, guid: 668e21f47ca6dac44976fb885888d206,
+    type: 3}
+  hopePlatformType: {fileID: 11400000, guid: 19d07d51cd4c3ea48b170a9996644887, type: 2}
   hopeForwardDistance: 2.85
   hopeUpOffset: 0.4
   hopeLifetime: 10
   hopeBlinkTime: 2
-  wisdomRadius: 12
-  palette: {fileID: 0}
+  wisdomRadius: 11
+  palette: {fileID: 11400000, guid: dcabdb554f96dda41ac71e8739cd02de, type: 2}
   showDebugHud: 1
   useHitStop: 1
   hitStopDuration: 0.05
@@ -2163,3 +2264,4 @@ SceneRoots:
   - {fileID: 1951405524}
   - {fileID: 1685365381}
   - {fileID: 1158771099}
+  - {fileID: 1408501456}
