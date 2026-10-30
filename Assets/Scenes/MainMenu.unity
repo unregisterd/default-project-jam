@@ -552,7 +552,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: CHASING THE STAR
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0199c0b009a77e0429746bb46e6a395c, type: 2}
   m_sharedMaterial: {fileID: -5092688622995239102, guid: 0199c0b009a77e0429746bb46e6a395c,
@@ -904,8 +904,8 @@ RectTransform:
   - {fileID: 1871699956}
   - {fileID: 1949341884}
   - {fileID: 729013534}
-  - {fileID: 1507908556}
   - {fileID: 46943166}
+  - {fileID: 1507908556}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5846,7 +5846,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!225 &1507908553
 CanvasGroup:
   m_ObjectHideFlags: 0

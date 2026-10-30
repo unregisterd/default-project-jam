@@ -184,7 +184,7 @@ public class MainMenuManager : MonoBehaviour
     private void RefreshLocalized()
     {
         if (titleLabel != null) titleLabel.text = Loc.Text("menu_title");
-        if (subtitleLabel != null) subtitleLabel.text = Loc.Language == "en" ? string.Empty : "CHASING THE STAR";
+        if (subtitleLabel != null) subtitleLabel.text = Loc.Language == "en" ? "逐星" : "CHASING THE STAR";
         if (startLabel != null) startLabel.text = Loc.Text("menu_start");
         if (quitLabel != null) quitLabel.text = Loc.Text("menu_quit");
 

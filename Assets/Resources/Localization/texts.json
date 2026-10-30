@@ -345,28 +345,28 @@
       "id": "esc_skill_courage",
       "type": "ui",
       "speaker": { "zh": "", "en": "" },
-      "text": { "zh": "勇气", "en": "Courage" },
+      "text": { "zh": "1 勇气", "en": "1 Courage" },
       "note": "技能名"
     },
     {
       "id": "esc_skill_wisdom",
       "type": "ui",
       "speaker": { "zh": "", "en": "" },
-      "text": { "zh": "智慧", "en": "Wisdom" },
+      "text": { "zh": "2 智慧", "en": "2 Wisdom" },
       "note": "技能名"
     },
     {
       "id": "esc_skill_patience",
       "type": "ui",
       "speaker": { "zh": "", "en": "" },
-      "text": { "zh": "耐心", "en": "Patience" },
+      "text": { "zh": "3 耐心", "en": "3 Patience" },
       "note": "技能名"
     },
     {
       "id": "esc_skill_hope",
       "type": "ui",
       "speaker": { "zh": "", "en": "" },
-      "text": { "zh": "希望", "en": "Hope" },
+      "text": { "zh": "4 希望", "en": "4 Hope" },
       "note": "技能名"
     },
     {
