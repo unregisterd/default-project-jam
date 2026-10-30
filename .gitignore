@@ -76,3 +76,18 @@ desktop.ini
 
 # Unity Version Control 工作区元数据
 /.plastic/
+
+# ---------------------------------------------------------------
+# 第三人称测试内容（本地保留，不入库）
+# ---------------------------------------------------------------
+/Assets/StarterAssets/
+/Assets/Scenes/Sandbox/
+/Assets/Scenes/Sandbox.meta
+/Assets/Scripts/Player/ThirdPersonMotorAdapter.cs*
+/Assets/Scripts/Player/CameraTargetAutoBinder.cs*
+/Assets/Scripts/Editor/ThirdPersonSandbox.cs*
+/Assets/Scripts/Editor/SandboxAbilities.cs*
+/Assets/Scripts/Editor/PlayerPrefabExporter.cs*
+/Assets/Prefabs/Player/Player_ThirdPerson.prefab*
+/Assets/Prefabs/Player/PlayerFollowCamera_TP.prefab*
+/Assets/Materials/M_SandboxGround.mat*
