@@ -1678,13 +1678,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
+      propertyPath: FallTimeout
+      value: 0.11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
+      propertyPath: JumpTimeout
+      value: 0.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
+        type: 3}
       propertyPath: SprintSpeed
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
       propertyPath: SpeedChangeRate
-      value: 12.35
+      value: 13.1
       objectReference: {fileID: 0}
     - target: {fileID: 4416926081852918490, guid: 64dce48905ffd9b4293e595fa6941544,
         type: 3}
@@ -1747,8 +1757,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   input: {fileID: 0}
-  maxPoints: 6
-  startPoints: 6
+  maxPoints: 8
+  startPoints: 8
   cooldown: 0.6
   courageHeight: 3.3
   courageForwardSpeed: 2
@@ -1756,8 +1766,8 @@ MonoBehaviour:
   patienceDuration: 1
   hopePlatformPrefab: {fileID: 0}
   hopePlatformType: {fileID: 0}
-  hopeForwardDistance: 2.5
-  hopeUpOffset: 0.8
+  hopeForwardDistance: 2.85
+  hopeUpOffset: 0.4
   hopeLifetime: 10
   hopeBlinkTime: 2
   wisdomRadius: 12
